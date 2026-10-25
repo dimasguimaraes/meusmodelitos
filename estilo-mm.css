@@ -57,6 +57,17 @@ p { color: #555555; line-height: 1.6; }
 .tech-tags { display: flex; gap: 10px; margin-top: 25px; flex-wrap: wrap; }
 .tech-tag { background-color: #eeeeee; padding: 8px 16px; border-radius: 20px; font-size: 0.9em; font-weight: 500; color: #333333; }
 
+/* --- Bloco 4: Clientes --- */
+.clients-container { text-align: center; padding: 40px 20px; max-width: 1200px; margin: 0 auto; }
+.clients-grid { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 40px; margin-top: 30px; }
+.clients-grid img { max-width: 130px; opacity: 0.7; filter: grayscale(100%); transition: all 0.3s ease; }
+.clients-grid img:hover { opacity: 1; filter: grayscale(0%); transform: scale(1.05); }
+
+/* --- Bloco 5: Footer --- */
+.footer-container { background: #111111; color: #dddddd; text-align: center; padding: 40px 20px; font-size: 0.9em; margin-top: 40px; border-radius: 12px 12px 0 0; }
+.footer-container p { color: #aaaaaa; margin-bottom: 5px; }
+.footer-container strong { color: #ffffff; font-family: 'Montserrat', sans-serif; font-size: 1.2em; display: block; margin-bottom: 15px; }
+
 /* --- Responsividade --- */
 @media (max-width: 768px) {
   .hero-container { padding: 40px 20px; text-align: center; }
