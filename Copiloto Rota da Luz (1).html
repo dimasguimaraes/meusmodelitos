@@ -1,0 +1,3001 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#050811" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>Copiloto Rota da Luz — ClimbPro, DescentPro & Nutrição</title>
+  <style>
+    :root {
+      --bg-base: #050811;
+      --bg-card: #0c1222;
+      --bg-card-inner: #131c33;
+      --bg-input: #1a2644;
+      --border-subtle: #243356;
+      --border-strong: #3b5284;
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --accent-amber: #f59e0b;
+      --accent-amber-glow: rgba(245, 158, 11, 0.25);
+      --accent-orange: #ea580c;
+      --accent-emerald: #10b981;
+      --accent-emerald-glow: rgba(16, 185, 129, 0.22);
+      --accent-sky: #38bdf8;
+      --accent-sky-glow: rgba(56, 189, 248, 0.22);
+      --accent-rose: #f43f5e;
+      --accent-purple: #a855f7;
+      --radius-lg: 18px;
+      --radius-md: 12px;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background-color: var(--bg-base);
+      color: var(--text-primary);
+      line-height: 1.4;
+      padding-bottom: 52px;
+      overflow-x: hidden;
+      user-select: none;
+    }
+
+    .mono {
+      font-family: var(--font-mono);
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* BANNER GIGANTE DE ALARME ATIVO */
+    .alarm-banner {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 999;
+      background: linear-gradient(135deg, #f59e0b 0%, #ea580c 55%, #dc2626 100%);
+      color: #050811;
+      padding: 14px 16px;
+      border-bottom: 4px solid #ffffff;
+      box-shadow: 0 12px 40px rgba(234, 88, 12, 0.65);
+      display: none;
+      animation: bannerPulse 1.1s infinite;
+    }
+    .alarm-banner.descent-theme {
+      background: linear-gradient(135deg, #0284c7 0%, #0d9488 55%, #10b981 100%);
+      color: #ffffff;
+      box-shadow: 0 12px 40px rgba(16, 185, 129, 0.55);
+    }
+    .alarm-banner.visible {
+      display: block;
+    }
+    @keyframes bannerPulse {
+      0%, 100% { filter: brightness(1); }
+      50% { filter: brightness(1.1); }
+    }
+    .alarm-banner-inner {
+      max-width: 840px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .alarm-banner-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 1;
+      min-width: 240px;
+    }
+    .alarm-banner-icon {
+      font-size: 36px;
+      background: #ffffff;
+      color: #050811;
+      width: 58px;
+      height: 58px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    }
+    .alarm-banner-tag {
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      opacity: 0.92;
+    }
+    .alarm-banner-title {
+      font-size: 20px;
+      font-weight: 900;
+      line-height: 1.15;
+    }
+    .alarm-banner-desc {
+      font-size: 14px;
+      font-weight: 700;
+      margin-top: 3px;
+    }
+    .btn-dismiss {
+      background: #050811;
+      color: #ffffff;
+      border: none;
+      border-radius: 14px;
+      padding: 16px 24px;
+      font-size: 15px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      flex-shrink: 0;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.35);
+    }
+    .btn-dismiss:active {
+      transform: scale(0.97);
+    }
+
+    /* CABEÇALHO STICKY */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(5, 8, 17, 0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 10px 14px;
+    }
+    .header-inner {
+      max-width: 840px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .brand-logo {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: var(--accent-amber-glow);
+      border: 1px solid var(--accent-amber);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+    }
+    .brand-title {
+      font-size: 17px;
+      font-weight: 900;
+      letter-spacing: -0.02em;
+    }
+    .brand-title span {
+      color: var(--accent-amber);
+    }
+    .status-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 3px;
+    }
+    .pill {
+      font-size: 11px;
+      font-weight: 800;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: var(--bg-card-inner);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-subtle);
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .pill.ok {
+      background: rgba(16, 185, 129, 0.16);
+      color: #6ee7b7;
+      border-color: rgba(16, 185, 129, 0.4);
+    }
+    .pill.warn {
+      background: rgba(244, 63, 94, 0.16);
+      color: #fda4af;
+      border-color: rgba(244, 63, 94, 0.4);
+    }
+    .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #64748b;
+    }
+    .dot.active {
+      background: #10b981;
+      box-shadow: 0 0 8px #10b981;
+    }
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    /* BOTÕES GERAIS */
+    button, .file-btn {
+      font-family: var(--font-sans);
+      cursor: pointer;
+      border-radius: var(--radius-md);
+      font-weight: 800;
+      transition: transform 0.1s ease, background-color 0.15s ease, border-color 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      border: 1px solid transparent;
+    }
+    button:active, .file-btn:active {
+      transform: scale(0.97);
+    }
+    .btn-amber {
+      background: var(--accent-amber);
+      color: #050811;
+      padding: 10px 14px;
+      font-size: 13px;
+    }
+    .btn-purple {
+      background: var(--accent-purple);
+      color: #ffffff;
+      padding: 10px 14px;
+      font-size: 13px;
+    }
+    .btn-dark {
+      background: var(--bg-card-inner);
+      color: var(--text-primary);
+      border-color: var(--border-subtle);
+      padding: 10px 13px;
+      font-size: 13px;
+    }
+    .btn-dark.active-wake {
+      border-color: var(--accent-amber);
+      color: var(--accent-amber);
+    }
+
+    /* CONTAINER PRINCIPAL */
+    main {
+      max-width: 840px;
+      margin: 0 auto;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 14px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+    }
+    .card-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .card-title {
+      font-size: 14px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .card-subtitle {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+
+    /* SELETOR DE ROTA */
+    .route-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 8px;
+    }
+    .route-btn {
+      background: var(--bg-card-inner);
+      border: 2px solid var(--border-subtle);
+      border-radius: 14px;
+      padding: 12px;
+      text-align: left;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      color: var(--text-secondary);
+    }
+    .route-btn.selected {
+      background: rgba(245, 158, 11, 0.12);
+      border-color: var(--accent-amber);
+      color: var(--text-primary);
+    }
+    .route-tag {
+      font-size: 11px;
+      font-weight: 900;
+      text-transform: uppercase;
+      color: var(--accent-amber);
+    }
+    .route-btn:nth-child(2) .route-tag {
+      color: var(--accent-sky);
+    }
+    .route-btn:nth-child(3) .route-tag {
+      color: var(--accent-emerald);
+    }
+    .route-name {
+      font-size: 14px;
+      font-weight: 800;
+      margin: 2px 0;
+      color: var(--text-primary);
+    }
+    .route-meta {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    /* CONTROLES DE PEDAL E TELEMETRIA */
+    .ride-controls {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .btn-primary-ride {
+      flex: 1;
+      padding: 16px;
+      font-size: 16px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      border-radius: 14px;
+      background: var(--accent-emerald);
+      color: #050811;
+      box-shadow: 0 6px 20px var(--accent-emerald-glow);
+    }
+    .btn-primary-ride.running {
+      background: var(--accent-amber);
+      box-shadow: 0 6px 20px var(--accent-amber-glow);
+    }
+    .telemetry-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+    @media (min-width: 600px) {
+      .telemetry-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+    .tele-box {
+      background: var(--bg-base);
+      border: 1px solid var(--border-subtle);
+      border-radius: 14px;
+      padding: 12px;
+    }
+    .tele-label {
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      letter-spacing: 0.05em;
+    }
+    .tele-val-row {
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+      margin: 4px 0 2px;
+    }
+    .tele-val {
+      font-size: 32px;
+      font-weight: 900;
+      line-height: 1;
+      color: var(--text-primary);
+    }
+    .tele-unit {
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--text-secondary);
+    }
+    .tele-sub {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--accent-amber);
+    }
+
+    /* SIMULAÇÃO */
+    .sim-box {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border-subtle);
+    }
+    .sim-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .sim-slider-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      flex: 1;
+      height: 12px;
+      background: var(--bg-input);
+      border-radius: 999px;
+      outline: none;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--accent-amber);
+      border: 3px solid var(--bg-base);
+      cursor: pointer;
+    }
+
+    /* RADAR CLIMBPRO + DESCENTPRO */
+    .climb-controls-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg-base);
+      padding: 10px;
+      border-radius: 12px;
+      border: 1px solid var(--border-subtle);
+      margin-bottom: 12px;
+    }
+    .grad-presets {
+      display: flex;
+      gap: 5px;
+      flex-wrap: wrap;
+    }
+    .grad-btn {
+      padding: 7px 11px;
+      font-size: 12px;
+      font-weight: 900;
+      border-radius: 8px;
+      background: var(--bg-card-inner);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-subtle);
+    }
+    .grad-btn.active {
+      background: var(--accent-amber);
+      color: #050811;
+      border-color: var(--accent-amber);
+    }
+    .inline-control {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-secondary);
+    }
+    select, input[type="number"], input[type="text"] {
+      background: var(--bg-input);
+      color: var(--text-primary);
+      border: 1px solid var(--border-strong);
+      border-radius: 8px;
+      padding: 6px 8px;
+      font-weight: 800;
+      font-size: 13px;
+    }
+
+    .climb-hero {
+      background: linear-gradient(145deg, #090e1c 0%, #111a30 100%);
+      border: 2px solid rgba(245, 158, 11, 0.45);
+      border-radius: 16px;
+      padding: 14px;
+      margin-bottom: 12px;
+      transition: all 0.25s ease;
+    }
+    .climb-hero.climbing-now {
+      background: linear-gradient(145deg, #2a1208 0%, #1a0d14 100%);
+      border-color: var(--accent-orange);
+      box-shadow: 0 0 25px rgba(234, 88, 12, 0.28);
+    }
+    .climb-hero.descending-now {
+      background: linear-gradient(145deg, #07222b 0%, #092b24 100%);
+      border-color: var(--accent-sky);
+      box-shadow: 0 0 25px rgba(56, 189, 248, 0.25);
+    }
+    .climb-hero.next-descent {
+      border-color: rgba(56, 189, 248, 0.5);
+    }
+    .climb-hero.clear-road {
+      border-color: rgba(16, 185, 129, 0.4);
+    }
+    .climb-hero-top {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+    .climb-badge {
+      font-size: 11px;
+      font-weight: 900;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: rgba(245, 158, 11, 0.2);
+      color: #fcd34d;
+      border: 1px solid rgba(245, 158, 11, 0.4);
+    }
+    .climb-hero.climbing-now .climb-badge {
+      background: var(--accent-orange);
+      color: #ffffff;
+      border-color: #fdba74;
+    }
+    .climb-hero.descending-now .climb-badge,
+    .climb-hero.next-descent .climb-badge {
+      background: rgba(56, 189, 248, 0.22);
+      color: #7dd3fc;
+      border-color: rgba(56, 189, 248, 0.5);
+    }
+    .climb-hero-title {
+      font-size: 19px;
+      font-weight: 900;
+      margin-bottom: 10px;
+    }
+    .progress-track {
+      width: 100%;
+      height: 12px;
+      background: var(--bg-base);
+      border-radius: 999px;
+      overflow: hidden;
+      border: 1px solid var(--border-strong);
+      margin: 8px 0 12px;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #f59e0b, #ea580c, #f43f5e);
+      width: 0%;
+      transition: width 0.25s ease;
+    }
+    .progress-fill.descent {
+      background: linear-gradient(90deg, #38bdf8, #0ea5e9, #10b981);
+    }
+    .climb-metrics {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      background: rgba(5, 8, 17, 0.75);
+      padding: 10px;
+      border-radius: 12px;
+      border: 1px solid var(--border-subtle);
+    }
+    @media (min-width: 560px) {
+      .climb-metrics {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+    .c-metric {
+      text-align: center;
+    }
+    .c-metric-lbl {
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+    }
+    .c-metric-val {
+      font-size: 18px;
+      font-weight: 900;
+      margin-top: 2px;
+    }
+
+    /* GRÁFICO SVG ALTIMÉTRICO */
+    .svg-wrap {
+      background: var(--bg-base);
+      border: 1px solid var(--border-subtle);
+      border-radius: 14px;
+      padding: 8px;
+    }
+    #elevationSvg {
+      width: 100%;
+      height: 190px;
+      display: block;
+    }
+    .svg-legend {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      color: var(--text-secondary);
+      margin-top: 6px;
+      padding: 0 4px;
+    }
+    .legend-items {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .legend-dot {
+      display: inline-block;
+      width: 9px;
+      height: 9px;
+      border-radius: 2px;
+      margin-right: 4px;
+    }
+
+    /* VOICE PERSONALITY BAR */
+    .voice-mode-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      background: linear-gradient(135deg, rgba(168, 85, 247, 0.14), rgba(245, 158, 11, 0.1));
+      border: 1px solid rgba(168, 85, 247, 0.4);
+      border-radius: 14px;
+      padding: 12px;
+    }
+    .voice-toggle-group {
+      display: flex;
+      gap: 6px;
+      background: var(--bg-base);
+      padding: 4px;
+      border-radius: 10px;
+      border: 1px solid var(--border-subtle);
+    }
+    .voice-style-btn {
+      padding: 8px 12px;
+      font-size: 12px;
+      border-radius: 8px;
+      background: transparent;
+      color: var(--text-secondary);
+    }
+    .voice-style-btn.active {
+      background: var(--accent-purple);
+      color: #ffffff;
+    }
+
+    /* TIMERS DE NUTRIÇÃO */
+    .caffeine-banner {
+      background: var(--bg-base);
+      border: 1px solid rgba(99, 102, 241, 0.45);
+      border-radius: 14px;
+      padding: 12px;
+      margin-bottom: 12px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .timers-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 10px;
+    }
+    .timer-card {
+      background: var(--bg-base);
+      border: 1px solid var(--border-subtle);
+      border-radius: 14px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .timer-card.urgent {
+      border-color: var(--accent-amber);
+      box-shadow: 0 0 14px rgba(245, 158, 11, 0.2);
+    }
+    .timer-card.cut-active {
+      border-color: #818cf8;
+      background: rgba(49, 46, 129, 0.2);
+    }
+    .timer-card.disabled {
+      opacity: 0.48;
+    }
+    .timer-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    .timer-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .timer-icon {
+      font-size: 24px;
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: var(--bg-card-inner);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .timer-name {
+      font-size: 14px;
+      font-weight: 800;
+    }
+    .timer-hint {
+      font-size: 11px;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+    .timer-countdown {
+      text-align: right;
+    }
+    .timer-countdown-val {
+      font-size: 20px;
+      font-weight: 900;
+    }
+    .timer-bar {
+      width: 100%;
+      height: 6px;
+      background: var(--bg-card-inner);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .timer-bar-fill {
+      height: 100%;
+      background: var(--accent-sky);
+      transition: width 0.3s linear;
+    }
+    .timer-card.urgent .timer-bar-fill {
+      background: var(--accent-amber);
+    }
+    .timer-actions {
+      display: flex;
+      gap: 6px;
+    }
+    .btn-reset-timer {
+      flex: 1;
+      background: var(--bg-card-inner);
+      color: var(--accent-emerald);
+      border-color: var(--border-subtle);
+      padding: 10px;
+      font-size: 12px;
+    }
+
+    /* HISTÓRICO DE AVISOS EM TEXTO */
+    .log-list {
+      max-height: 220px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .log-item {
+      background: var(--bg-base);
+      border-left: 4px solid var(--accent-amber);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 12px;
+    }
+    .log-item.climb {
+      border-left-color: var(--accent-orange);
+    }
+    .log-item.descent {
+      border-left-color: var(--accent-sky);
+    }
+    .log-item.summit {
+      border-left-color: var(--accent-emerald);
+    }
+    .log-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--text-secondary);
+      margin-bottom: 3px;
+    }
+    .log-text {
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    /* LISTA DE SUBIDAS, DESCIDAS E CHECKPOINTS */
+    .dual-details {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    @media (min-width: 640px) {
+      .dual-details {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+    details {
+      background: var(--bg-base);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 8px 12px;
+    }
+    details summary {
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      padding: 4px 0;
+      list-style: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .list-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 8px;
+      max-height: 240px;
+      overflow-y: auto;
+    }
+    .list-row {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+    }
+    .list-row.passed {
+      opacity: 0.5;
+    }
+
+    /* MODAIS & TOAST */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      background: rgba(0, 0, 0, 0.84);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .modal-backdrop.open {
+      display: flex;
+    }
+    .modal-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border-strong);
+      border-radius: 18px;
+      padding: 20px;
+      max-width: 480px;
+      width: 100%;
+      max-height: 88vh;
+      overflow-y: auto;
+    }
+    .science-item {
+      background: var(--bg-base);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 10px;
+    }
+    .science-item h4 {
+      font-size: 14px;
+      font-weight: 900;
+      color: var(--accent-amber);
+      margin-bottom: 4px;
+    }
+    .science-item p {
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.45;
+    }
+    .toast {
+      position: fixed;
+      bottom: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 900;
+      background: #1e293b;
+      color: #ffffff;
+      border: 1px solid #475569;
+      padding: 10px 16px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 800;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      display: none;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+      max-width: 92vw;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .toast.show {
+      display: flex;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- BANNER GIGANTE DE ALARME ATIVO -->
+  <div id="alarmBanner" class="alarm-banner">
+    <div class="alarm-banner-inner">
+      <div class="alarm-banner-left">
+        <div id="alarmIcon" class="alarm-banner-icon">⛰️</div>
+        <div>
+          <div id="alarmTag" class="alarm-banner-tag">RADAR CLIMBPRO</div>
+          <div id="alarmTitle" class="alarm-banner-title">SUBIDA FORTE À FRENTE!</div>
+          <div id="alarmDesc" class="alarm-banner-desc">Prepare a marcha leve e mantenha o giro.</div>
+        </div>
+      </div>
+      <button class="btn-dismiss" onclick="dismissAlarm()">OK / ENTENDIDO ✓</button>
+    </div>
+  </div>
+
+  <!-- CABEÇALHO -->
+  <header>
+    <div class="header-inner">
+      <div class="brand">
+        <div class="brand-logo">🚴</div>
+        <div>
+          <div class="brand-title">COPILOTO <span>ROTA DA LUZ</span></div>
+          <div class="status-pills">
+            <span class="pill" id="gpsPill"><span class="dot" id="gpsDot"></span><span id="gpsText">GPS Aguardando</span></span>
+            <span class="pill warn" id="audioPill">🔇 Toque em Testar Voz</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <button class="btn-amber" onclick="testVoiceImmediate()">🔊 Testar Voz</button>
+        <button class="btn-purple" onclick="playRandomCinemaSatire()">🎭 Ouvir Exemplos</button>
+        <button class="btn-dark" id="wakeBtn" onclick="toggleWakeLock()">☀️ Tela: OFF</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- 1. SELETOR DE PERCURSO & GPX -->
+    <section class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">📍 Etapa & Traçado Altimétrico</div>
+          <div class="card-subtitle">Selecione o dia da travessia ou carregue um arquivo .GPX oficial</div>
+        </div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <label class="file-btn btn-dark" style="color:#38bdf8;">
+            📂 Carregar .GPX
+            <input type="file" id="gpxInput" accept=".gpx,application/gpx+xml" style="display:none;" onchange="handleGpxFile(event)" />
+          </label>
+          <button class="btn-dark" style="color:#10b981;" onclick="exportOfflineHtml()">💾 Salvar Offline</button>
+        </div>
+      </div>
+
+      <div class="route-grid">
+        <button class="route-btn selected" id="btnRoute_day1" onclick="selectRoute('day1')">
+          <span class="route-tag">Sexta 20/11 • Dia 1</span>
+          <span class="route-name">Mogi das Cruzes → Pousada da Marlene</span>
+          <span class="route-meta mono">Redenção da Serra • 115.0 km • +1.591m</span>
+        </button>
+
+        <button class="route-btn" id="btnRoute_day2" onclick="selectRoute('day2')">
+          <span class="route-tag">Sábado 21/11 • Dia 2</span>
+          <span class="route-name">Redenção da Serra → Aparecida</span>
+          <span class="route-meta mono">Santuário Nacional • 86.6 km • +1.028m</span>
+        </button>
+
+        <button class="route-btn" id="btnRoute_custom" onclick="selectRoute('custom')">
+          <span class="route-tag">Arquivo Próprio</span>
+          <span class="route-name" id="customNameLabel">Nenhum .GPX carregado</span>
+          <span class="route-meta mono" id="customMetaLabel">Clique em "Carregar .GPX" acima</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- 2. CONTROLE GPS REAL, TELEMETRIA & MODO SIMULAÇÃO -->
+    <section class="card">
+      <div class="ride-controls">
+        <button class="btn-primary-ride" id="btnStartRide" onclick="toggleRide()">
+          ▶️ INICIAR GPS REAL
+        </button>
+        <button class="btn-dark" onclick="openResetModal()" title="Zerar pedal">↺ Zerar</button>
+      </div>
+
+      <div class="telemetry-grid">
+        <div class="tele-box">
+          <div class="tele-label">Distância</div>
+          <div class="tele-val-row">
+            <span class="tele-val mono" id="valDist">0.0</span>
+            <span class="tele-unit">km</span>
+          </div>
+          <div class="tele-sub mono" id="valRemDist">Faltam 115.0 km</div>
+        </div>
+
+        <div class="tele-box">
+          <div class="tele-label">Tempo Pedal</div>
+          <div class="tele-val-row">
+            <span class="tele-val mono" id="valTime">00:00</span>
+          </div>
+          <div class="tele-sub mono" id="valEta" style="color:#94a3b8;">00s • Chegada --:--</div>
+        </div>
+
+        <div class="tele-box">
+          <div class="tele-label">Velocidade</div>
+          <div class="tele-val-row">
+            <span class="tele-val mono" id="valSpeed" style="color:#38bdf8;">0.0</span>
+            <span class="tele-unit">km/h</span>
+          </div>
+          <div class="tele-sub mono" id="valAvgSpeed" style="color:#94a3b8;">Média: 12.2 km/h</div>
+        </div>
+
+        <div class="tele-box">
+          <div class="tele-label">Altitude / Subida</div>
+          <div class="tele-val-row">
+            <span class="tele-val mono" id="valAlt" style="color:#10b981;">745</span>
+            <span class="tele-unit">m</span>
+          </div>
+          <div class="tele-sub mono" id="valGain" style="color:#94a3b8;">Ganho: +0 m</div>
+        </div>
+      </div>
+
+      <!-- MODO SIMULAÇÃO -->
+      <div class="sim-box">
+        <div class="sim-header">
+          <span style="font-size:12px; font-weight:900; color:#c084fc; text-transform:uppercase;">
+            🧪 Modo Simulação (Test Drive em Casa)
+          </span>
+          <div style="display:flex; gap:6px;">
+            <button class="btn-purple" id="btnSimToggle" onclick="toggleSimulation()">▶ Simular 30x</button>
+            <button class="btn-dark mono" id="btnSimSpeed" onclick="cycleSimSpeed()">30x</button>
+          </div>
+        </div>
+        <div class="sim-slider-row">
+          <span class="mono" style="font-size:12px; color:#94a3b8;">0km</span>
+          <input type="range" id="simSlider" min="0" max="115" step="0.1" value="0" oninput="onSimSliderInput(this.value)" />
+          <span class="mono" id="simMaxKmLabel" style="font-size:12px; color:#94a3b8;">115km</span>
+        </div>
+        <div style="font-size:11px; color:#94a3b8; margin-top:6px;">
+          Arraste a barra para testar subidas (ex: km 8, km 72), descidas de recompensa (ex: km 9,5, km 16, km 74) ou avance até ~98 km no Dia 1 para testar o corte de cafeína antes da Pousada da Marlene.
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. PERSONALIDADE DE VOZ (CINEMA & ZUEIRA VS TÉCNICO) -->
+    <section class="card">
+      <div class="voice-mode-bar">
+        <div>
+          <div class="card-title" style="margin-bottom:2px;">🎙️ Personalidade do Copiloto de Voz</div>
+          <div class="card-subtitle">Treinador dramático nas subidas + voz de recompensa nas descidas + sátiras na nutrição</div>
+        </div>
+        <div class="voice-toggle-group">
+          <button class="voice-style-btn active" id="voiceBtn_cinema" onclick="setVoicePersonality('cinema')">🎬 Cinema & Zueira</button>
+          <button class="voice-style-btn" id="voiceBtn_tech" onclick="setVoicePersonality('tech')">📢 Técnico / Direto</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. RADAR BIDIRECIONAL: SUBIDAS (CLIMBPRO) & DESCIDAS (DESCENTPRO) -->
+    <section class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">⛰️ Radar Bidirecional: Subidas & Descidas</div>
+          <div class="card-subtitle">Detecta rampas &ge; +X% (cume real) e descidas &le; -X% (recompensa e cautela até a base)</div>
+        </div>
+      </div>
+
+      <!-- Controles de Inclinação & Antecedência -->
+      <div class="climb-controls-bar">
+        <div class="grad-presets" id="gradPresetGroup">
+          <button class="grad-btn" data-grad="4" onclick="setMinGradient(4)">4%</button>
+          <button class="grad-btn" data-grad="5" onclick="setMinGradient(5)">5%</button>
+          <button class="grad-btn active" data-grad="6" onclick="setMinGradient(6)">6%</button>
+          <button class="grad-btn" data-grad="8" onclick="setMinGradient(8)">8%</button>
+          <button class="grad-btn" data-grad="10" onclick="setMinGradient(10)">10%</button>
+        </div>
+
+        <div class="inline-control">
+          <span>Inclinação:</span>
+          <input type="number" id="gradInput" min="2" max="25" step="0.5" value="6" style="width:62px; text-align:center; color:#f59e0b;" onchange="setMinGradient(parseFloat(this.value))" />
+          <span>%</span>
+        </div>
+
+        <div class="inline-control">
+          <span>Avisar</span>
+          <select id="leadKmSelect" onchange="setLeadKm(parseFloat(this.value))">
+            <option value="0.5">500m</option>
+            <option value="1.0" selected>1km</option>
+            <option value="1.5">1.5km</option>
+            <option value="2.0">2km</option>
+            <option value="3.0">3km</option>
+          </select>
+          <span>antes</span>
+        </div>
+      </div>
+
+      <!-- Card Destaque Dinâmico (Subida Ativa, Descida Ativa, ou Próximo Evento) -->
+      <div class="climb-hero" id="climbHeroCard">
+        <div class="climb-hero-top">
+          <span class="climb-badge" id="climbStatusBadge">PRÓXIMA SUBIDA &gt; 6%</span>
+          <span class="mono" id="climbLandmarkText" style="font-size:12px; font-weight:700; color:#94a3b8;">Subida Sabaúna • Cume: 845m</span>
+        </div>
+
+        <div class="climb-hero-title" id="climbHeroTitle">
+          Rampa de 1,8 km • Máx 7.8% (Média 5.3%)
+        </div>
+
+        <!-- Barra de Progresso (Aparece durante Subida ou Descida Ativa) -->
+        <div id="climbProgressArea" style="display:none;">
+          <div style="display:flex; justify-content:space-between; font-size:11px; font-weight:800; color:#fdba74;" class="mono" id="climbProgressLabels">
+            <span id="climbPctText">Progresso: 0%</span>
+            <span id="climbRemEleText">Faltam +0m</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill" id="climbProgressFill"></div>
+          </div>
+        </div>
+
+        <div class="climb-metrics">
+          <div class="c-metric">
+            <div class="c-metric-lbl" id="cMetric1Lbl">Início em</div>
+            <div class="c-metric-val mono" id="cMetric1Val" style="color:#f59e0b;">7.2 km</div>
+          </div>
+          <div class="c-metric">
+            <div class="c-metric-lbl" id="cMetric2Lbl">Chegada Est.</div>
+            <div class="c-metric-val mono" id="cMetric2Val" style="color:#38bdf8;">~35 min</div>
+          </div>
+          <div class="c-metric">
+            <div class="c-metric-lbl" id="cMetric3Lbl">Extensão Trecho</div>
+            <div class="c-metric-val mono" id="cMetric3Val">1.80 km</div>
+          </div>
+          <div class="c-metric">
+            <div class="c-metric-lbl" id="cMetric4Lbl">Desnível Vertical</div>
+            <div class="c-metric-val mono" id="cMetric4Val" style="color:#10b981;">+95 m</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Perfil Altimétrico SVG Interativo -->
+      <div class="svg-wrap">
+        <svg id="elevationSvg" viewBox="0 0 800 190" preserveAspectRatio="none"></svg>
+        <div class="svg-legend mono">
+          <span>0.0 km</span>
+          <div class="legend-items">
+            <span><i class="legend-dot" style="background:#ffffff;"></i>Você</span>
+            <span><i class="legend-dot" style="background:#f43f5e;"></i>Subida &ge;+<span class="gradLegendSpan">6</span>%</span>
+            <span><i class="legend-dot" style="background:#38bdf8;"></i>Descida &le;-<span class="gradLegendSpan">6</span>%</span>
+            <span><i class="legend-dot" style="background:#10b981;"></i>Cume/Base</span>
+          </div>
+          <span id="svgEndKm">115.0 km</span>
+        </div>
+      </div>
+
+      <!-- Listas Expansíveis: Subidas e Descidas Detectadas -->
+      <div class="dual-details">
+        <details>
+          <summary>
+            <span>⛰️ Subidas (&ge;+<span class="gradLegendSpan">6</span>%): <strong id="climbCountText">0</strong></span>
+            <span>▼</span>
+          </summary>
+          <div class="list-stack" id="climbsList"></div>
+        </details>
+
+        <details>
+          <summary>
+            <span>🪂 Descidas (&le;-<span class="gradLegendSpan">6</span>%): <strong id="descentCountText">0</strong></span>
+            <span>▼</span>
+          </summary>
+          <div class="list-stack" id="descentsList"></div>
+        </details>
+      </div>
+    </section>
+
+    <!-- 5. PROTOCOLO NUTRICIONAL (ACSM / ISSN / FABRICANTES) & TRAVA DE CAFEÍNA -->
+    <section class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">⏱️ Protocolo Nutricional & Hidratação (Endurance &gt;6h)</div>
+          <div class="card-subtitle">Calibrado por diretrizes ACSM/ISSN: 45–60g CHO/h + 500–750ml/h + reposição de sódio</div>
+        </div>
+        <div style="display:flex; gap:6px; flex-wrap:wrap;">
+          <button class="btn-dark" style="color:#38bdf8; padding:8px 11px; font-size:12px;" onclick="openScienceModal()">📊 Base Nutricional</button>
+          <button class="btn-dark" style="padding:8px 11px; font-size:12px;" onclick="resetNutritionDefaults()">↺ Padrão Científico</button>
+        </div>
+      </div>
+
+      <!-- Trava de Cafeína antes da Pousada da Marlene -->
+      <div class="caffeine-banner">
+        <div style="flex:1; min-width:220px;">
+          <div style="font-size:12px; font-weight:900; color:#a5b4fc; display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+            <span>🌙 TRAVA INTELIGENTE DE CAFEÍNA (DIA 1)</span>
+            <span class="pill ok" id="caffeinePill">LIBERADO AGORA</span>
+          </div>
+          <div style="font-size:11px; color:#94a3b8; margin-top:3px;">
+            Bloqueia o Carbo Gel perto da Pousada da Marlene e avisa para usar só <b>Balinha de Banana ou Água</b> para não atrapalhar seu sono.
+          </div>
+        </div>
+        <div class="inline-control">
+          <span>Cortar faltando</span>
+          <input type="number" id="caffeineCutoffInput" value="90" min="0" max="240" step="5" style="width:64px; text-align:center; color:#a5b4fc;" onchange="setCaffeineCutoff(this.value)" />
+          <span>min</span>
+        </div>
+      </div>
+
+      <div class="timers-grid" id="timersGrid"></div>
+    </section>
+
+    <!-- 6. HISTÓRICO VISUAL DE AVISOS EM TEXTO -->
+    <section class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">💬 Histórico de Avisos & Falas do Copiloto</div>
+          <div class="card-subtitle">Registro em tempo real com quilometragem e horário</div>
+        </div>
+        <button class="btn-dark" style="padding:6px 10px; font-size:11px;" onclick="clearLogs()">Limpar</button>
+      </div>
+      <div class="log-list" id="logList">
+        <div class="log-item">
+          <div class="log-meta"><span>SISTEMA PRONTO</span><span class="mono">0.0 km</span></div>
+          <div class="log-text">Toque em "Testar Voz" ou "Ouvir Exemplos" no topo para liberar o áudio no navegador.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. CHECKPOINTS ESTRATÉGICOS -->
+    <section class="card">
+      <div class="card-title" style="margin-bottom:8px;">🗺️ Checkpoints Estratégicos da Etapa</div>
+      <div class="list-stack" id="checkpointsList" style="max-height:none;"></div>
+    </section>
+
+  </main>
+
+  <!-- MODAL BASE NUTRICIONAL (ACSM / ISSN / FABRICANTES) -->
+  <div class="modal-backdrop" id="scienceModal">
+    <div class="modal-box">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <h3 style="font-size:17px; font-weight:900;">📊 Base Científica & Fabricantes</h3>
+        <button class="btn-dark" style="padding:6px 10px;" onclick="closeScienceModal()">✕</button>
+      </div>
+      <p style="font-size:12px; color:#94a3b8; margin-bottom:12px;">
+        Em pedais acima de 4 a 8 horas (como os 115 km até Redenção da Serra), o corpo consome glicogênio muscular rápido e perde eletrólitos no suor. Os intervalos padrão seguem diretrizes do <b>ACSM (American College of Sports Medicine)</b>, <b>ISSN</b> e recomendações dos fabricantes:
+      </p>
+
+      <div class="science-item">
+        <h4>💧 Água Pura — A cada 20 min</h4>
+        <p>Diretrizes de hidratação no ciclismo apontam ingestão total entre <b>500 ml e 750 ml/hora</b> (ajustando conforme o calor). Pequenos goles a cada 20 min evitam desconforto gástrico nas subidas e auxiliam a absorção do carbo gel.</p>
+      </div>
+
+      <div class="science-item">
+        <h4>🥤 Isotônico Líquido — A cada 30 min</h4>
+        <p>Substitui cápsulas de sal fornecendo <b>400 a 700 mg de sódio/hora</b> + potássio e carboidratos simples (concentração isotônica de 6–8%, conforme rótulos como Gatorade/Go! Isotônico), acelerando o esvaziamento gástrico e prevenindo câimbras e hiponatremia.</p>
+      </div>
+
+      <div class="science-item">
+        <h4>🍬 Balinhas de Banana — A cada 35 min</h4>
+        <p>Fornecem ~15 a 20g de carboidrato sólido de fácil mastigação. Alternar sólido + líquido ajuda a atingir a janela ideal de <b>45 a 60g de carboidrato/hora</b> sem enjoar o paladar no meio do estradão.</p>
+      </div>
+
+      <div class="science-item">
+        <h4>⚡ Carbo Gel — A cada 45 min (Corte 90 min antes da pousada)</h4>
+        <p>Padrão recomendado pelos fabricantes (GU, CarbUp, Z2, Dobro): <b>1 sachê (~20–25g CHO) a cada 40–45 min</b> acompanhado de 2–3 goles de água. Como muitos géis contêm cafeína (meia-vida de 4–6h), o app bloqueia o aviso 90 min antes de Redenção para preservar seu sono.</p>
+      </div>
+
+      <button class="btn-amber" style="width:100%; padding:12px; margin-top:6px;" onclick="closeScienceModal()">Entendido ✓</button>
+    </div>
+  </div>
+
+  <!-- MODAL DE RESET -->
+  <div class="modal-backdrop" id="resetModal">
+    <div class="modal-box" style="max-width:380px;">
+      <h3 style="font-size:18px; font-weight:900; margin-bottom:6px;">Zerar Pedal Atual?</h3>
+      <p style="font-size:13px; color:#94a3b8;">Isso vai zerar o cronômetro, a distância percorrida e reiniciar os contadores de nutrição, subidas e descidas.</p>
+      <div style="display:flex; gap:10px; margin-top:18px;">
+        <button class="btn-dark" style="flex:1; padding:12px;" onclick="closeResetModal()">Cancelar</button>
+        <button class="btn-amber" style="flex:1; padding:12px; background:#f43f5e; color:#fff;" onclick="confirmReset()">Sim, Zerar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast" id="toastEl">
+    <span id="toastIcon">✅</span>
+    <span id="toastText">Salvo!</span>
+  </div>
+
+  <script>
+    /***************************************************************************
+     * 1. TRAÇADOS ALTIMÉTRICOS EMBUTIDOS (DIA 1 E DIA 2)
+     ***************************************************************************/
+    const BUILTIN_ROUTES = {
+      day1: {
+        id: 'day1',
+        name: 'Dia 1: Mogi das Cruzes → Pousada da Marlene',
+        totalKm: 115.0,
+        totalGain: 1591,
+        checkpoints: [
+          { km: 0.0, name: 'Estação Estudantes (Mogi)', time: '07:00', note: 'Largada pontual. Garrafas cheias e GPS ativo.' },
+          { km: 26.4, name: 'Guararema (Centro)', time: '08:50', note: 'Parada rápida (10 min): água, banheiro e carimbo.' },
+          { km: 46.4, name: 'Santa Branca', time: '10:35', note: 'Abastecer sólidos antes da serra rumo a Paraibuna.' },
+          { km: 84.7, name: 'Paraibuna (Ponto de Corte)', time: '14:00', note: 'Almoço leve (máx 40 min). Último comércio grande antes de Redenção!' },
+          { km: 115.0, name: 'Pousada da Marlene (Redenção da Serra)', time: '18:15', note: 'Chegada Dia 1! Recuperação pós-pedal e jantar.' }
+        ],
+        anchors: [
+          [0.0, 745, 'Estação Estudantes (Mogi)'],
+          [4.2, 758, 'César de Souza'],
+          [7.2, 750, 'Base Sabaúna'],
+          [9.0, 845, 'Subida de Sabaúna'],
+          [11.2, 730, 'Vila de Sabaúna'],
+          [13.8, 725, 'Base Morro do Mirante'],
+          [15.8, 865, 'Morro do Mirante'],
+          [18.2, 690, 'Descida para Guararema'],
+          [26.4, 575, 'Guararema (Rio Paraíba)'],
+          [32.5, 605, 'Saída Guararema'],
+          [35.2, 775, 'Serra de Santa Branca'],
+          [38.5, 675, 'Vale Intermediário'],
+          [42.2, 815, 'Alto de Santa Branca'],
+          [46.4, 645, 'Santa Branca'],
+          [52.5, 665, 'Estrada do Bairro Alto'],
+          [55.8, 875, 'Serra do Bairro Alto'],
+          [59.0, 730, 'Descida do Bairro Alto'],
+          [61.8, 735, 'Base Espírito Santo'],
+          [64.6, 915, 'Alto do Espírito Santo'],
+          [68.2, 740, 'Vale Ribeirão'],
+          [70.5, 745, 'Base Morro do Sabão'],
+          [73.2, 935, 'Morro do Sabão (Parede)'],
+          [77.5, 720, 'Descida Represa Paraibuna'],
+          [84.7, 635, 'Paraibuna (Centro)'],
+          [89.8, 660, 'Saída Paraibuna (Terra)'],
+          [93.2, 885, 'Serra do Cedro'],
+          [96.8, 760, 'Vale do Rio Lourenço'],
+          [99.0, 765, 'Base Sítio São Pedro'],
+          [101.6, 965, 'Subida Sítio São Pedro'],
+          [105.0, 835, 'Descida Sítio São Pedro'],
+          [106.8, 840, 'Base Serra de Redenção'],
+          [109.3, 995, 'Última Serra de Redenção'],
+          [115.0, 725, 'Pousada da Marlene (Redenção)']
+        ]
+      },
+      day2: {
+        id: 'day2',
+        name: 'Dia 2: Redenção da Serra → Aparecida',
+        totalKm: 86.6,
+        totalGain: 1028,
+        checkpoints: [
+          { km: 0.0, name: 'Pousada da Marlene (Redenção)', time: '07:15', note: 'Saída já em subida! Cadência leve na coroinha.' },
+          { km: 18.5, name: 'Alto da Serra de Taubaté', time: '09:15', note: 'Cume do dia (1.015m). Atenção nas curvas da descida!' },
+          { km: 37.8, name: 'Taubaté (Fim da Serra)', time: '11:15', note: 'O pior acabou! Daqui até Aparecida é quase plano.' },
+          { km: 59.6, name: 'Pindamonhangaba', time: '13:15', note: 'Bom ponto para almoço / lanche reforçado.' },
+          { km: 79.0, name: 'Roseira', time: '15:00', note: 'Reta final pelo Vale do Paraíba.' },
+          { km: 86.6, name: 'Basílica de Aparecida', time: '16:00', note: 'Missão cumprida! Celebre a chegada.' }
+        ],
+        anchors: [
+          [0.0, 725, 'Pousada da Marlene'],
+          [3.6, 895, 'Subida Inicial de Redenção'],
+          [6.5, 795, 'Vale do Ribeirão'],
+          [8.8, 800, 'Base Serra do Paiol'],
+          [11.5, 985, 'Serra do Paiol (Rampa Forte)'],
+          [14.2, 880, 'Selado intermediário'],
+          [16.0, 885, 'Rampa Final da Serra'],
+          [18.5, 1015, 'Topo da Serra de Taubaté'],
+          [23.0, 760, 'Descida da Serra (Curvas)'],
+          [25.5, 755, 'Base Repique do Barreiro'],
+          [27.5, 845, 'Repique do Barreiro'],
+          [33.0, 620, 'Descida para o Vale'],
+          [37.8, 575, 'Taubaté'],
+          [44.5, 565, 'Quiririm / Várzea'],
+          [51.0, 585, 'Subida leve Moreira César'],
+          [59.6, 555, 'Pindamonhangaba'],
+          [66.8, 575, 'Estrada Velha / Fazendas'],
+          [79.0, 550, 'Roseira'],
+          [82.5, 570, 'Potim / Acesso Aparecida'],
+          [86.6, 545, 'Santuário Nacional de Aparecida']
+        ]
+      }
+    };
+
+    /***************************************************************************
+     * 2. BANCO DE FALAS CINEMA, RECOMPENSA DE DESCIDA & SÁTIRAS DE NUTRIÇÃO
+     ***************************************************************************/
+    const VOICE_SCRIPTS = {
+      climbBefore: [
+        (c, distStr, extStr, eta) => `Atenção, guerreiro! Em ${distStr}, aproximadamente ${eta} minutos, vem uma parede de ${extStr} com inclinação máxima de ${c.maxGrad} por cento: ${c.landmark}. Joga na coroinha, respira fundo e não olha para cima. Ninguém vai bater tão duro quanto essa serra, mas você vai passar por cima!`,
+        (c, distStr, extStr, eta) => `Missão dada é missão cumprida! Faltam ${distStr} para encarar ${c.landmark}. São ${extStr} de subida até ${c.maxGrad} por cento. Pede para sair não, ajusta o câmbio e sobe girando!`,
+        (c, distStr, extStr, eta) => `Espartanos, preparem as pernas! Em ${distStr} começa ${c.landmark}, uma rampa de ${extStr} e ganho de ${c.gainM} metros. Hoje nós jantamos no cume!`
+      ],
+      climbMid: [
+        (c) => `Metade da montanha já era! Se a perna está queimando, é sinal que está funcionando. Quem mandou querer ser ciclista? Continua girando, o cume de ${c.landmark} já está logo ali!`,
+        (c) => `Você já venceu cinquenta por cento de ${c.landmark}! Não importa o quão devagar você vá, desde que não pare. Mantém o foco e a cadência!`,
+        (c) => `Respira fundo! A parte mais dura de ${c.landmark} está ficando para trás. Agora é cabeça erguida até conquistar o topo!`
+      ],
+      climbSummit: [
+        (c) => `Topo conquistado! Você venceu ${c.landmark} e superou mais ${c.gainM} metros de subida. Solta o freio, recupera o fôlego e aproveita a recompensa!`,
+        (c) => `Cume alcançado! A gravidade perdeu essa batalha. Parabéns pela escalada em ${c.landmark}, agora é só deixar a bike rolar!`,
+        (c) => `Vitória no cume de ${c.landmark}! Mais uma montanha riscada do mapa da Rota da Luz.`
+      ],
+      descentBefore: [
+        (d, distStr, extStr) => `Recompensa merecida à vista! Em ${distStr} começa uma descida de ${extStr} com menos ${d.dropM} metros de desnível: ${d.landmark}. Aproveite para descansar as pernas, girar solto e hidratar, mas olho vivo nas valetas e curvas do estradão!`,
+        (d, distStr, extStr) => `Depois da tempestade vem a bonança! Faltam ${distStr} para uma descida de ${extStr} em ${d.landmark}. Solta os ombros, dá uma descansada no quadríceps e mantém a mão nos freios nas curvas!`,
+        (d, distStr, extStr) => `Hora da recompensa! Em ${distStr} você entra em ${extStr} de descida até ${d.landmark}. Aproveita para recuperar o fôlego e beber água, sempre com atenção no cascalho!`
+      ],
+      descentEnd: [
+        (d) => `Fim da descida de ${d.landmark}! Descanso concluído. Reajuste as marchas, volte para a cadência e siga firme na rota!`,
+        (d) => `Base da descida alcançada! Pernas recuperadas em ${d.landmark}, agora é retomar o giro constante!`
+      ],
+      water: [
+        "Bebe água agora antes que você vire uva-passa no meio do estradão!",
+        "Alerta de hidratação! Seu rim acabou de mandar um WhatsApp pedindo socorro. Dê três goles generosos de água pura!",
+        "Hora da água! Não espere sentir sede, senão a câimbra vem cobrar o aluguel nas próximas subidas."
+      ],
+      isotonic: [
+        "Hora do isotônico líquido! Repõe sódio e eletrólitos antes que sua panturrilha dê um nó cego no meio da serra!",
+        "Alerta de eletrólitos! Você já suou meio rio Paraíba, dá dois goles caprichados no isotônico líquido para manter o motor girando!",
+        "Sódio e sais minerais na área! Manda o isotônico líquido para dentro e evita a câimbra."
+      ],
+      bananinha: [
+        "Hora da balinha de banana! Combustível de atleta de alta performance raiz. Mastiga aí e segue o baile!",
+        "Pausa estratégica para a balinha de banana! Carboidrato sólido sem frescura para empurrar essa bike.",
+        "Alerta de bananinha! O açúcar natural que transforma ciclista cansado em trator de serra."
+      ],
+      carbogel: [
+        "Hora do carbo gel! Aquele sabor maravilhoso de remédio doce que salva o seu pedal. Manda para dentro com água!",
+        "Injeção de foguete! Hora do carbo gel para garantir energia pelos próximos quarenta e cinco minutos. Não esquece de beber água junto!",
+        "Alerta de carbo gel! Hora de abrir o sachê e dar aquele turbo nas próximas rampas."
+      ],
+      caffeineCut: [
+        "Alerta de sono! Faltam menos de noventa minutos para a Pousada da Marlene. Carbo gel com cafeína está bloqueado! Coma balinha de banana ou beba água, senão você vai ficar contando carneirinho em Redenção da Serra!",
+        "Corte de cafeína ativado! Já estamos na reta final para a pousada. Nada de gel agora para não estragar seu sono em Redenção. Vai de balinha de banana ou água!"
+      ],
+      snack: [
+        "Hora do lanche! Até carro precisa parar no posto, imagine você. Come algo sólido para segurar a onda!",
+        "Alerta de comida de verdade! Hora de mastigar um lanche para não bater o prego de fome no estradão."
+      ]
+    };
+
+    /***************************************************************************
+     * 3. ESTADO GLOBAL & PROTOCOLO NUTRICIONAL CIENTÍFICO (ACSM / ISSN)
+     ***************************************************************************/
+    const STORAGE_KEY = 'copiloto_rota_luz_v5_bidir';
+
+    const SCIENTIFIC_ALARMS = [
+      { id: 'water', icon: '💧', name: 'Água Pura', hint: '500-750 ml/h somando líquidos', interval: 20, enabled: true, elapsed: 0 },
+      { id: 'isotonic', icon: '🥤', name: 'Isotônico Líquido', hint: '400-700 mg sódio/h (ACSM/ISSN)', interval: 30, enabled: true, elapsed: 0 },
+      { id: 'bananinha', icon: '🍬', name: 'Balinhas de Banana', hint: '~15-20g CHO sólido fácil mastigação', interval: 35, enabled: true, elapsed: 0 },
+      { id: 'carbogel', icon: '⚡', name: 'Carbo Gel (40-45m)', hint: '1 sachê (~22g CHO) + goles de água', interval: 45, enabled: true, elapsed: 0 },
+      { id: 'snack', icon: '🥪', name: 'Lanche / Parada Sólida', hint: 'Reforço energético em pedais >6h', interval: 90, enabled: true, elapsed: 0 }
+    ];
+
+    let state = {
+      routeId: 'day1',
+      customRoute: null,
+      isRunning: false,
+      elapsedSec: 0,
+      distanceKm: 0,
+      speedKmh: 0,
+      altM: 745,
+      gainM: 0,
+      lastGps: null,
+      minGradient: 6.0,
+      leadKm: 1.0,
+      caffeineCutoffMin: 90,
+      voiceStyle: 'cinema',
+      alarms: JSON.parse(JSON.stringify(SCIENTIFIC_ALARMS)),
+      triggeredClimbBefore: {},
+      triggeredClimbMid: {},
+      triggeredClimbSummit: {},
+      triggeredDescentBefore: {},
+      triggeredDescentEnd: {}
+    };
+
+    let profilePoints = [];
+    let detectedClimbs = [];
+    let detectedDescents = [];
+    let tickTimer = null;
+    let gpsWatchId = null;
+    let simTimer = null;
+    let isSimPlaying = false;
+    let simSpeed = 30;
+    let wakeLock = null;
+    let audioCtx = null;
+    let bannerTimer = null;
+
+    /***************************************************************************
+     * 4. PERFIL ALTIMÉTRICO & DETECÇÃO BIDIRECIONAL (CLIMBPRO + DESCENTPRO)
+     ***************************************************************************/
+    function buildProfileFromAnchors(anchors) {
+      const pts = [];
+      const stepKm = 0.05; // 50m de resolução
+      for (let i = 0; i < anchors.length - 1; i++) {
+        const [k1, e1, n1] = anchors[i];
+        const [k2, e2, n2] = anchors[i + 1];
+        const seg = k2 - k1;
+        const steps = Math.max(1, Math.round(seg / stepKm));
+        for (let s = 0; s < steps; s++) {
+          const t = s / steps;
+          const smooth = (1 - Math.cos(t * Math.PI)) / 2;
+          pts.push({
+            km: Number((k1 + seg * t).toFixed(3)),
+            ele: Math.round(e1 + (e2 - e1) * smooth),
+            grad: 0,
+            landmark: t < 0.5 ? n1 : n2
+          });
+        }
+      }
+      const last = anchors[anchors.length - 1];
+      pts.push({ km: last[0], ele: last[1], grad: 0, landmark: last[2] });
+
+      for (let i = 0; i < pts.length; i++) {
+        const pPrev = pts[Math.max(0, i - 2)];
+        const pNext = pts[Math.min(pts.length - 1, i + 2)];
+        const dKm = pNext.km - pPrev.km;
+        const dEle = pNext.ele - pPrev.ele;
+        pts[i].grad = dKm > 0 ? Number(((dEle / (dKm * 1000)) * 100).toFixed(1)) : 0;
+      }
+      return pts;
+    }
+
+    // Algoritmo ClimbPro Up (Subidas >= +minGrad)
+    function detectClimbsClimbPro(pts, minGrad) {
+      const climbs = [];
+      let inClimb = false;
+      let startIdx = 0;
+      let peakIdx = 0;
+      let maxGrad = 0;
+      let flatAccumKm = 0;
+
+      for (let i = 0; i < pts.length; i++) {
+        const p = pts[i];
+        const stepKm = i > 0 ? Math.max(0, p.km - pts[i - 1].km) : 0;
+
+        if (!inClimb) {
+          if (p.grad >= minGrad) {
+            let runKm = 0;
+            for (let j = i; j < pts.length; j++) {
+              if (pts[j].grad >= minGrad * 0.85) {
+                runKm = pts[j].km - p.km;
+                if (runKm >= 0.1) break;
+              } else {
+                break;
+              }
+            }
+            if (runKm >= 0.1) {
+              inClimb = true;
+              startIdx = Math.max(0, i - 1);
+              peakIdx = i;
+              maxGrad = p.grad;
+              flatAccumKm = 0;
+            }
+          }
+        } else {
+          if (p.ele >= pts[peakIdx].ele) peakIdx = i;
+          if (p.grad > maxGrad) maxGrad = p.grad;
+
+          if (p.grad < -1.5) {
+            pushClimb(pts, climbs, startIdx, peakIdx, maxGrad);
+            inClimb = false;
+          } else if (p.grad < 1.0) {
+            flatAccumKm += stepKm;
+            if (flatAccumKm > 0.15) {
+              pushClimb(pts, climbs, startIdx, peakIdx, maxGrad);
+              inClimb = false;
+            }
+          } else {
+            flatAccumKm = 0;
+          }
+        }
+      }
+      if (inClimb) pushClimb(pts, climbs, startIdx, peakIdx, maxGrad);
+      return climbs;
+    }
+
+    function pushClimb(pts, list, sIdx, eIdx, maxGrad) {
+      if (eIdx <= sIdx) return;
+      const pStart = pts[sIdx];
+      const pEnd = pts[eIdx];
+      const lengthKm = Number((pEnd.km - pStart.km).toFixed(2));
+      const gainM = Math.round(pEnd.ele - pStart.ele);
+      if (lengthKm >= 0.1 && gainM >= 8) {
+        const avgGrad = Number(((gainM / (lengthKm * 1000)) * 100).toFixed(1));
+        list.push({
+          type: 'climb',
+          id: `up_${pStart.km.toFixed(2)}`,
+          startKm: pStart.km,
+          endKm: pEnd.km,
+          midKm: Number(((pStart.km + pEnd.km) / 2).toFixed(2)),
+          startEle: pStart.ele,
+          summitEle: pEnd.ele,
+          lengthKm,
+          gainM,
+          maxGrad: Number(maxGrad.toFixed(1)),
+          avgGrad,
+          landmark: pEnd.landmark || pStart.landmark || 'Trecho de Serra'
+        });
+      }
+    }
+
+    // Algoritmo DescentPro Down (Descidas <= -minGrad, lógica espelhada)
+    function detectDescentsDescentPro(pts, minGrad) {
+      const descents = [];
+      let inDescent = false;
+      let startIdx = 0;
+      let valleyIdx = 0;
+      let steepestGrad = 0; // valor negativo mais acentuado (ex: -8.5)
+      let flatAccumKm = 0;
+
+      for (let i = 0; i < pts.length; i++) {
+        const p = pts[i];
+        const stepKm = i > 0 ? Math.max(0, p.km - pts[i - 1].km) : 0;
+
+        if (!inDescent) {
+          if (p.grad <= -minGrad) {
+            let runKm = 0;
+            for (let j = i; j < pts.length; j++) {
+              if (pts[j].grad <= -(minGrad * 0.85)) {
+                runKm = pts[j].km - p.km;
+                if (runKm >= 0.1) break;
+              } else {
+                break;
+              }
+            }
+            if (runKm >= 0.1) {
+              inDescent = true;
+              startIdx = Math.max(0, i - 1);
+              valleyIdx = i;
+              steepestGrad = p.grad;
+              flatAccumKm = 0;
+            }
+          }
+        } else {
+          if (p.ele <= pts[valleyIdx].ele) valleyIdx = i;
+          if (p.grad < steepestGrad) steepestGrad = p.grad;
+
+          // Fim da descida (base): volta a subir > +1.5% ou fica plano > 150m (> -1.0%)
+          if (p.grad > 1.5) {
+            pushDescent(pts, descents, startIdx, valleyIdx, steepestGrad);
+            inDescent = false;
+          } else if (p.grad > -1.0) {
+            flatAccumKm += stepKm;
+            if (flatAccumKm > 0.15) {
+              pushDescent(pts, descents, startIdx, valleyIdx, steepestGrad);
+              inDescent = false;
+            }
+          } else {
+            flatAccumKm = 0;
+          }
+        }
+      }
+      if (inDescent) pushDescent(pts, descents, startIdx, valleyIdx, steepestGrad);
+      return descents;
+    }
+
+    function pushDescent(pts, list, sIdx, eIdx, steepestGrad) {
+      if (eIdx <= sIdx) return;
+      const pStart = pts[sIdx];
+      const pEnd = pts[eIdx];
+      const lengthKm = Number((pEnd.km - pStart.km).toFixed(2));
+      const dropM = Math.round(pStart.ele - pEnd.ele);
+      if (lengthKm >= 0.1 && dropM >= 8) {
+        const avgGrad = Number(((dropM / (lengthKm * 1000)) * 100).toFixed(1));
+        list.push({
+          type: 'descent',
+          id: `dn_${pStart.km.toFixed(2)}`,
+          startKm: pStart.km,
+          endKm: pEnd.km,
+          startEle: pStart.ele,
+          baseEle: pEnd.ele,
+          lengthKm,
+          dropM,
+          maxGrad: Number(Math.abs(steepestGrad).toFixed(1)),
+          avgGrad,
+          landmark: pEnd.landmark || pStart.landmark || 'Descida de Serra'
+        });
+      }
+    }
+
+    function fmtDist(km) {
+      return km < 1.0 ? `${Math.round(km * 1000)} m` : `${km.toFixed(2).replace('.', ',')} km`;
+    }
+
+    /***************************************************************************
+     * 5. IMPORTAÇÃO REAL DE ARQUIVOS .GPX
+     ***************************************************************************/
+    function haversineKm(lat1, lon1, lat2, lon2) {
+      const R = 6371;
+      const dLat = (lat2 - lat1) * Math.PI / 180;
+      const dLon = (lon2 - lon1) * Math.PI / 180;
+      const a = Math.sin(dLat / 2) ** 2 +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                Math.sin(dLon / 2) ** 2;
+      return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
+    }
+
+    function handleGpxFile(ev) {
+      const file = ev.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const xml = new DOMParser().parseFromString(e.target.result, 'text/xml');
+          const trk = Array.from(xml.getElementsByTagName('trkpt'));
+          const ptsXml = trk.length ? trk : Array.from(xml.getElementsByTagName('rtept'));
+          if (ptsXml.length < 2) {
+            showToast('⚠️', 'Arquivo GPX inválido ou sem coordenadas.');
+            return;
+          }
+
+          let cumKm = 0;
+          let pLat = parseFloat(ptsXml[0].getAttribute('lat'));
+          let pLon = parseFloat(ptsXml[0].getAttribute('lon'));
+          let pEleEl = ptsXml[0].getElementsByTagName('ele')[0];
+          let pEle = pEleEl ? parseFloat(pEleEl.textContent) : 0;
+
+          const raw = [{ km: 0, ele: pEle }];
+          for (let i = 1; i < ptsXml.length; i++) {
+            const lat = parseFloat(ptsXml[i].getAttribute('lat'));
+            const lon = parseFloat(ptsXml[i].getAttribute('lon'));
+            const eleEl = ptsXml[i].getElementsByTagName('ele')[0];
+            const ele = eleEl ? parseFloat(eleEl.textContent) : pEle;
+            const d = haversineKm(pLat, pLon, lat, lon);
+            if (d >= 0.03) {
+              cumKm += d;
+              raw.push({ km: Number(cumKm.toFixed(3)), ele });
+              pLat = lat;
+              pLon = lon;
+              pEle = ele;
+            }
+          }
+
+          // Suavização móvel (5 pontos)
+          let totalGain = 0;
+          const smoothed = raw.map((pt, idx) => {
+            let sum = 0, cnt = 0;
+            for (let k = Math.max(0, idx - 2); k <= Math.min(raw.length - 1, idx + 2); k++) {
+              sum += raw[k].ele;
+              cnt++;
+            }
+            return { km: pt.km, ele: Math.round(sum / cnt), grad: 0, landmark: `Km ${pt.km.toFixed(1)}` };
+          });
+
+          for (let i = 1; i < smoothed.length; i++) {
+            const diff = smoothed[i].ele - smoothed[i - 1].ele;
+            if (diff > 1) totalGain += diff;
+          }
+          for (let i = 0; i < smoothed.length; i++) {
+            const b = smoothed[Math.max(0, i - 3)];
+            const f = smoothed[Math.min(smoothed.length - 1, i + 3)];
+            const dk = f.km - b.km;
+            const de = f.ele - b.ele;
+            smoothed[i].grad = dk > 0 ? Number(((de / (dk * 1000)) * 100).toFixed(1)) : 0;
+          }
+
+          const title = file.name.replace(/\.gpx$/i, '');
+          state.customRoute = {
+            id: 'custom',
+            name: title,
+            totalKm: Number(cumKm.toFixed(1)),
+            totalGain: Math.round(totalGain),
+            points: smoothed,
+            checkpoints: [
+              { km: 0, name: 'Início GPX', time: '--:--', note: title },
+              { km: Number((cumKm / 2).toFixed(1)), name: 'Metade do Trajeto', time: '--:--', note: 'Conferir água e isotônico.' },
+              { km: Number(cumKm.toFixed(1)), name: 'Chegada GPX', time: '--:--', note: 'Destino final.' }
+            ]
+          };
+
+          selectRoute('custom');
+          saveState();
+          showToast('✅', `GPX importado: ${cumKm.toFixed(1)} km (+${Math.round(totalGain)}m)`);
+        } catch (err) {
+          showToast('❌', 'Falha ao processar arquivo GPX.');
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    /***************************************************************************
+     * 6. MOTOR DE VOZ (WEB SPEECH API) & EFEITOS SONOROS (WEB AUDIO API)
+     ***************************************************************************/
+    function unlockAudio() {
+      if (!audioCtx) {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (AC) audioCtx = new AC();
+      }
+      if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+      const pill = document.getElementById('audioPill');
+      pill.className = 'pill ok';
+      pill.textContent = '🔊 Voz & Áudio Ativos';
+    }
+
+    function playSynthSound(kind) {
+      try {
+        unlockAudio();
+        if (!audioCtx) return;
+        const now = audioCtx.currentTime;
+        let notes = [523.25, 659.25, 783.99]; // ding nutrição
+        let wave = 'triangle';
+
+        if (kind === 'climb') {
+          notes = [440, 554.37, 659.25, 880]; // sirene épica subida
+          wave = 'sawtooth';
+        } else if (kind === 'descent') {
+          notes = [659.25, 783.99, 987.77, 1174.66]; // acorde relaxante recompensa descida
+          wave = 'sine';
+        } else if (kind === 'summit') {
+          notes = [523.25, 659.25, 783.99, 1046.5, 1318.5]; // fanfarra cume
+          wave = 'triangle';
+        }
+
+        notes.forEach((freq, i) => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = wave;
+          osc.frequency.setValueAtTime(freq, now + i * 0.13);
+          gain.gain.setValueAtTime(0.001, now + i * 0.13);
+          gain.gain.exponentialRampToValueAtTime(0.32, now + i * 0.13 + 0.03);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.13 + 0.25);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(now + i * 0.13);
+          osc.stop(now + i * 0.13 + 0.26);
+        });
+      } catch (e) {}
+    }
+
+    function speakText(text, persona = 'satire') {
+      try {
+        if (!('speechSynthesis' in window)) return;
+        window.speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(text);
+        u.lang = 'pt-BR';
+        u.volume = 1.0;
+
+        if (state.voiceStyle === 'tech') {
+          u.pitch = 1.0;
+          u.rate = 1.05;
+        } else if (persona === 'coach') {
+          // Treinador dramático de filme
+          u.pitch = 0.75;
+          u.rate = 0.88;
+        } else if (persona === 'reward') {
+          // Voz calma e acolhedora para recompensa nas descidas
+          u.pitch = 1.04;
+          u.rate = 0.96;
+        } else {
+          // Voz sarcástica/animada para sátiras de nutrição
+          u.pitch = 1.15;
+          u.rate = 1.06;
+        }
+
+        window.speechSynthesis.speak(u);
+      } catch (e) {}
+    }
+
+    function pickRandom(arr) {
+      return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    function fireAlert({ icon, tag, title, desc, speech, soundType = 'nutrition', persona = 'satire', logType = 'nutrition', theme = '' }) {
+      playSynthSound(soundType);
+      if ('vibrate' in navigator) navigator.vibrate([300, 100, 300, 100, 450]);
+      setTimeout(() => speakText(speech, persona), 550);
+
+      const banner = document.getElementById('alarmBanner');
+      banner.className = `alarm-banner visible ${theme}`;
+      document.getElementById('alarmIcon').textContent = icon;
+      document.getElementById('alarmTag').textContent = tag;
+      document.getElementById('alarmTitle').textContent = title;
+      document.getElementById('alarmDesc').textContent = desc;
+
+      clearTimeout(bannerTimer);
+      bannerTimer = setTimeout(() => banner.classList.remove('visible'), 20000);
+
+      appendLog(icon, title, speech, logType);
+    }
+
+    function dismissAlarm() {
+      document.getElementById('alarmBanner').classList.remove('visible');
+      if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+    }
+
+    function appendLog(icon, title, text, type = 'nutrition') {
+      const list = document.getElementById('logList');
+      const now = new Date();
+      const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+      const div = document.createElement('div');
+      div.className = `log-item ${type}`;
+      div.innerHTML = `
+        <div class="log-meta">
+          <span>${icon} ${title}</span>
+          <span class="mono">${timeStr} • ${state.distanceKm.toFixed(1)} km</span>
+        </div>
+        <div class="log-text">${text}</div>
+      `;
+      list.prepend(div);
+      while (list.children.length > 25) list.removeChild(list.lastChild);
+    }
+
+    function clearLogs() {
+      document.getElementById('logList').innerHTML = '';
+    }
+
+    function testVoiceImmediate() {
+      unlockAudio();
+      fireAlert({
+        icon: '🚴',
+        tag: 'TESTE DE ÁUDIO',
+        title: 'VOZ E RADAR BIDIRECIONAL ATIVOS!',
+        desc: 'Subidas, descidas de recompensa e protocolo nutricional prontos.',
+        speech: state.voiceStyle === 'cinema'
+          ? 'Copiloto Rota da Luz ativado! Treinador de filme nas subidas, voz de recompensa nas descidas e sátiras nutricionais prontos para encarar a serra!'
+          : 'Copiloto Rota da Luz ativado. Áudio e radar bidirecional operando.',
+        soundType: 'summit',
+        persona: 'coach'
+      });
+    }
+
+    function playRandomCinemaSatire() {
+      unlockAudio();
+      const sampleClimb = detectedClimbs[0] || { landmark: 'Morro do Sabão', maxGrad: 8.5, gainM: 140, lengthKm: 2.1 };
+      const sampleDescent = detectedDescents[0] || { landmark: 'Descida para Guararema', maxGrad: 7.4, dropM: 175, lengthKm: 2.4 };
+      const samples = [
+        {
+          icon: '⛰️',
+          tag: 'EXEMPLO • TREINADOR DE FILME (SUBIDA)',
+          title: 'PREPARAR PARA A SERRA!',
+          desc: 'Voz grave dramática antes da rampa.',
+          speech: pickRandom(VOICE_SCRIPTS.climbBefore)(sampleClimb, '1,00 km', fmtDist(sampleClimb.lengthKm), 5),
+          soundType: 'climb',
+          persona: 'coach',
+          logType: 'climb'
+        },
+        {
+          icon: '🪂',
+          tag: 'EXEMPLO • RECOMPENSA & CAUTELA (DESCIDA)',
+          title: 'DESCIDA MERECIDA À FRENTE!',
+          desc: 'Voz calma celebrando descanso + cautela nas curvas.',
+          speech: pickRandom(VOICE_SCRIPTS.descentBefore)(sampleDescent, '800 m', fmtDist(sampleDescent.lengthKm)),
+          soundType: 'descent',
+          persona: 'reward',
+          logType: 'descent',
+          theme: 'descent-theme'
+        },
+        {
+          icon: '🥤',
+          tag: 'EXEMPLO • ISOTÔNICO LÍQUIDO (30 MIN)',
+          title: 'REPOSIÇÃO DE SÓDIO!',
+          desc: 'Sátira para manter eletrólitos em dia.',
+          speech: pickRandom(VOICE_SCRIPTS.isotonic),
+          soundType: 'nutrition',
+          persona: 'satire',
+          logType: 'nutrition'
+        },
+        {
+          icon: '⚡',
+          tag: 'EXEMPLO • CARBO GEL (45 MIN)',
+          title: 'INJEÇÃO DE FOGUETE!',
+          desc: 'Sátira de carbo gel.',
+          speech: pickRandom(VOICE_SCRIPTS.carbogel),
+          soundType: 'nutrition',
+          persona: 'satire',
+          logType: 'nutrition'
+        },
+        {
+          icon: '🌙',
+          tag: 'EXEMPLO • TRAVA DE CAFEÍNA (90 MIN)',
+          title: 'SEM GEL PERTO DA POUSADA!',
+          desc: 'Protegendo seu sono em Redenção da Serra.',
+          speech: pickRandom(VOICE_SCRIPTS.caffeineCut),
+          soundType: 'nutrition',
+          persona: 'satire',
+          logType: 'nutrition'
+        }
+      ];
+      fireAlert(pickRandom(samples));
+    }
+
+    function setVoicePersonality(style) {
+      state.voiceStyle = style;
+      document.getElementById('voiceBtn_cinema').classList.toggle('active', style === 'cinema');
+      document.getElementById('voiceBtn_tech').classList.toggle('active', style === 'tech');
+      saveState();
+      showToast('🎙️', style === 'cinema' ? 'Modo Cinema & Zueira ativado!' : 'Modo Técnico / Direto ativado!');
+    }
+
+    /***************************************************************************
+     * 7. WAKE LOCK API (MANTER TELA ACESA NO GUIDÃO)
+     ***************************************************************************/
+    async function toggleWakeLock() {
+      const btn = document.getElementById('wakeBtn');
+      if (!('wakeLock' in navigator)) {
+        showToast('⚠️', 'Seu navegador não suporta trava de tela automática.');
+        return;
+      }
+      if (wakeLock) {
+        await wakeLock.release();
+        wakeLock = null;
+        btn.classList.remove('active-wake');
+        btn.textContent = '☀️ Tela: OFF';
+        showToast('🌙', 'Bloqueio de tela normal.');
+      } else {
+        try {
+          wakeLock = await navigator.wakeLock.request('screen');
+          btn.classList.add('active-wake');
+          btn.textContent = '🔆 Tela: ACESA';
+          showToast('🔆', 'Tela travada acesa para o guidão!');
+          wakeLock.addEventListener('release', () => {
+            wakeLock = null;
+            btn.classList.remove('active-wake');
+            btn.textContent = '☀️ Tela: OFF';
+          });
+        } catch (e) {
+          showToast('⚠️', 'Não foi possível manter a tela acesa.');
+        }
+      }
+    }
+
+    /***************************************************************************
+     * 8. GPS REAL, TIMERS E EVENTOS DE SUBIDA, DESCIDA E NUTRIÇÃO
+     ***************************************************************************/
+    function toggleRide() {
+      unlockAudio();
+      state.isRunning = !state.isRunning;
+      const btn = document.getElementById('btnStartRide');
+
+      if (state.isRunning) {
+        btn.classList.add('running');
+        btn.textContent = '⏸️ PAUSAR PEDAL';
+        startGpsWatch();
+        if (!tickTimer) tickTimer = setInterval(onTickSecond, 1000);
+        showToast('🚴', 'GPS Real iniciado! Bom pedal!');
+      } else {
+        btn.classList.remove('running');
+        btn.textContent = '▶️ RETOMAR GPS REAL';
+        state.lastGps = null;
+        showToast('⏸️', 'Pedal pausado.');
+      }
+      saveState();
+    }
+
+    function startGpsWatch() {
+      if (!('geolocation' in navigator)) {
+        setGpsStatus(false, 'GPS Indisponível');
+        return;
+      }
+      setGpsStatus(false, 'Buscando Satélites...');
+      if (gpsWatchId !== null) navigator.geolocation.clearWatch(gpsWatchId);
+
+      gpsWatchId = navigator.geolocation.watchPosition(
+        (pos) => {
+          setGpsStatus(true, `GPS Ativo (±${Math.round(pos.coords.accuracy)}m)`);
+          const { latitude, longitude, altitude, speed } = pos.coords;
+          if (altitude !== null && !isNaN(altitude)) state.altM = Math.round(altitude);
+          if (speed !== null && !isNaN(speed)) state.speedKmh = Number((speed * 3.6).toFixed(1));
+
+          if (state.isRunning && !isSimPlaying) {
+            if (state.lastGps) {
+              const d = haversineKm(state.lastGps.lat, state.lastGps.lon, latitude, longitude);
+              if (d >= 0.005 && d < 0.5) advanceKm(d);
+            }
+            state.lastGps = { lat: latitude, lon: longitude };
+          }
+          renderAll();
+        },
+        () => setGpsStatus(false, 'Sinal GPS Fraco/Negado'),
+        { enableHighAccuracy: true, maximumAge: 2000, timeout: 10000 }
+      );
+    }
+
+    function setGpsStatus(active, text) {
+      document.getElementById('gpsText').textContent = text;
+      document.getElementById('gpsDot').className = active ? 'dot active' : 'dot';
+    }
+
+    function isCaffeineBlocked() {
+      if (state.routeId !== 'day1' || state.caffeineCutoffMin <= 0) return false;
+      const route = getActiveRoute();
+      const remKm = Math.max(0, route.totalKm - state.distanceKm);
+      const speed = getAvgSpeed();
+      const remMin = (remKm / speed) * 60;
+      return remMin <= state.caffeineCutoffMin;
+    }
+
+    function onTickSecond() {
+      if (!state.isRunning && !isSimPlaying) return;
+      const step = isSimPlaying ? simSpeed : 1;
+      state.elapsedSec += step;
+
+      state.alarms.forEach(alarm => {
+        if (!alarm.enabled) return;
+        alarm.elapsed += step;
+        if (alarm.elapsed >= alarm.interval * 60) {
+          alarm.elapsed = 0;
+          triggerNutritionAlarm(alarm);
+        }
+      });
+
+      renderAll();
+      if (state.elapsedSec % 10 === 0) saveState();
+    }
+
+    function triggerNutritionAlarm(alarm) {
+      const isCinema = state.voiceStyle === 'cinema';
+
+      if (alarm.id === 'carbogel' && isCaffeineBlocked()) {
+        const speech = isCinema
+          ? pickRandom(VOICE_SCRIPTS.caffeineCut)
+          : `Corte de cafeína ativo faltando menos de ${state.caffeineCutoffMin} minutos para Redenção. Coma balinhas de banana ou beba água.`;
+        fireAlert({
+          icon: '🌙',
+          tag: `TRAVA DE CAFEÍNA (< ${state.caffeineCutoffMin} MIN P/ POUSADA)`,
+          title: 'BALINHA DE BANANA OU ÁGUA!',
+          desc: 'Carbo Gel bloqueado para não atrapalhar seu sono na Pousada da Marlene.',
+          speech,
+          soundType: 'nutrition',
+          persona: 'satire',
+          logType: 'nutrition'
+        });
+        return;
+      }
+
+      let speech = `Hora de: ${alarm.name}.`;
+      if (isCinema) {
+        if (alarm.id === 'water') speech = pickRandom(VOICE_SCRIPTS.water);
+        else if (alarm.id === 'isotonic') speech = pickRandom(VOICE_SCRIPTS.isotonic);
+        else if (alarm.id === 'bananinha') speech = pickRandom(VOICE_SCRIPTS.bananinha);
+        else if (alarm.id === 'carbogel') speech = pickRandom(VOICE_SCRIPTS.carbogel);
+        else if (alarm.id === 'snack') speech = pickRandom(VOICE_SCRIPTS.snack);
+      }
+
+      fireAlert({
+        icon: alarm.icon,
+        tag: `PROTOCOLO • A CADA ${alarm.interval} MIN`,
+        title: alarm.name.toUpperCase(),
+        desc: speech,
+        speech,
+        soundType: 'nutrition',
+        persona: 'satire',
+        logType: 'nutrition'
+      });
+    }
+
+    function advanceKm(deltaKm) {
+      const prevKm = state.distanceKm;
+      state.distanceKm = Number((state.distanceKm + deltaKm).toFixed(3));
+
+      const p1 = getPointAtKm(prevKm);
+      const p2 = getPointAtKm(state.distanceKm);
+      if (p2) {
+        if (gpsWatchId === null || isSimPlaying) state.altM = p2.ele;
+        if (p1 && p2.ele > p1.ele) state.gainM += (p2.ele - p1.ele);
+      }
+
+      checkElevationEvents(prevKm, state.distanceKm);
+    }
+
+    function checkElevationEvents(prevKm, currKm) {
+      const isCinema = state.voiceStyle === 'cinema';
+      const speed = getAvgSpeed();
+
+      // 1. Eventos de SUBIDA (ClimbPro Up)
+      for (const c of detectedClimbs) {
+        if (!state.triggeredClimbBefore[c.id]) {
+          const distToStart = c.startKm - currKm;
+          if (distToStart > 0 && distToStart <= state.leadKm) {
+            state.triggeredClimbBefore[c.id] = true;
+            const eta = Math.max(1, Math.round((distToStart / speed) * 60));
+            const distStr = fmtDist(distToStart);
+            const extStr = fmtDist(c.lengthKm);
+
+            const speech = isCinema
+              ? pickRandom(VOICE_SCRIPTS.climbBefore)(c, distStr, extStr, eta)
+              : `Atenção. Subida forte em ${distStr}, aproximadamente ${eta} minutos. Extensão de ${extStr}, inclinação máxima ${c.maxGrad} por cento e ganho de ${c.gainM} metros.`;
+
+            fireAlert({
+              icon: '⛰️',
+              tag: `SUBIDA FORTE >= +${state.minGradient}%`,
+              title: `RAMPA DE ${extStr.toUpperCase()} EM ${distStr.toUpperCase()}!`,
+              desc: `${c.landmark} • Máx ${c.maxGrad}% • +${c.gainM}m até o cume (~${eta} min).`,
+              speech,
+              soundType: 'climb',
+              persona: 'coach',
+              logType: 'climb'
+            });
+            return;
+          }
+        }
+
+        if (!state.triggeredClimbMid[c.id] && c.lengthKm >= 0.4 && prevKm < c.midKm && currKm >= c.midKm) {
+          state.triggeredClimbMid[c.id] = true;
+          const speech = isCinema
+            ? pickRandom(VOICE_SCRIPTS.climbMid)(c)
+            : `Metade da subida ${c.landmark} concluída. Mantenha o ritmo até o topo.`;
+
+          fireAlert({
+            icon: '🔥',
+            tag: 'MEIO DA ESCALADA (50%)',
+            title: 'METADE DA MONTANHA JÁ ERA!',
+            desc: `Continue girando! Faltam ${fmtDist(c.endKm - currKm)} até o cume.`,
+            speech,
+            soundType: 'climb',
+            persona: 'coach',
+            logType: 'climb'
+          });
+          return;
+        }
+
+        if (!state.triggeredClimbSummit[c.id] && prevKm < c.endKm && currKm >= c.endKm) {
+          state.triggeredClimbSummit[c.id] = true;
+          const speech = isCinema
+            ? pickRandom(VOICE_SCRIPTS.climbSummit)(c)
+            : `Topo da subida ${c.landmark} alcançado. Ganho total de ${c.gainM} metros.`;
+
+          fireAlert({
+            icon: '🏁',
+            tag: 'CUME CONQUISTADO!',
+            title: 'TOPO DA SUBIDA ALCANÇADO!',
+            desc: `Você venceu ${fmtDist(c.lengthKm)} e +${c.gainM}m (${c.landmark}).`,
+            speech,
+            soundType: 'summit',
+            persona: 'reward',
+            logType: 'summit'
+          });
+          return;
+        }
+      }
+
+      // 2. Eventos de DESCIDA / RECOMPENSA (DescentPro Down)
+      for (const d of detectedDescents) {
+        if (!state.triggeredDescentBefore[d.id]) {
+          const distToStart = d.startKm - currKm;
+          // Avisa pouco antes (até metade da antecedência ou mínimo 400m) ou no início exato
+          const descentLead = Math.max(0.4, state.leadKm * 0.6);
+          if (distToStart >= 0 && distToStart <= descentLead) {
+            state.triggeredDescentBefore[d.id] = true;
+            const distStr = distToStart < 0.08 ? 'agora' : `em ${fmtDist(distToStart)}`;
+            const extStr = fmtDist(d.lengthKm);
+
+            const speech = isCinema
+              ? pickRandom(VOICE_SCRIPTS.descentBefore)(d, distStr, extStr)
+              : `Descida de recompensa ${distStr}. Extensão de ${extStr}, desnível de menos ${d.dropM} metros. Aproveite para descansar as pernas, hidratar e redobre a atenção nas curvas e cascalho.`;
+
+            fireAlert({
+              icon: '🪂',
+              tag: `DESCIDA DE RECOMPENSA <= -${state.minGradient}%`,
+              title: `RECOMPENSA: DESCIDA DE ${extStr.toUpperCase()}!`,
+              desc: `${d.landmark} • -${d.dropM}m • Descanse as pernas, hidrate e atenção nas curvas!`,
+              speech,
+              soundType: 'descent',
+              persona: 'reward',
+              logType: 'descent',
+              theme: 'descent-theme'
+            });
+            return;
+          }
+        }
+
+        if (!state.triggeredDescentEnd[d.id] && prevKm < d.endKm && currKm >= d.endKm) {
+          state.triggeredDescentEnd[d.id] = true;
+          const speech = isCinema
+            ? pickRandom(VOICE_SCRIPTS.descentEnd)(d)
+            : `Fim da descida em ${d.landmark}. Reajuste as marchas e retome a cadência.`;
+
+          fireAlert({
+            icon: '🔄',
+            tag: 'BASE DA DESCIDA ALCANÇADA',
+            title: 'FIM DA DESCIDA — VOLTAR À CADÊNCIA!',
+            desc: `Trecho de ${fmtDist(d.lengthKm)} concluído (${d.landmark}). Ajuste o câmbio.`,
+            speech,
+            soundType: 'nutrition',
+            persona: 'reward',
+            logType: 'descent',
+            theme: 'descent-theme'
+          });
+          return;
+        }
+      }
+    }
+
+    // MODO SIMULAÇÃO
+    function toggleSimulation() {
+      unlockAudio();
+      isSimPlaying = !isSimPlaying;
+      const btn = document.getElementById('btnSimToggle');
+      if (isSimPlaying) {
+        btn.textContent = '⏸ Pausar Sim';
+        btn.style.background = '#f59e0b';
+        btn.style.color = '#050811';
+        state.speedKmh = 14.5;
+        if (!tickTimer) tickTimer = setInterval(onTickSecond, 1000);
+        simTimer = setInterval(() => {
+          const maxKm = getActiveRoute().totalKm;
+          const stepKm = (14.5 / 3600) * simSpeed * 0.25;
+          if (state.distanceKm + stepKm >= maxKm) {
+            state.distanceKm = maxKm;
+            toggleSimulation();
+            showToast('🏁', 'Simulação concluída!');
+          } else {
+            advanceKm(stepKm);
+          }
+          document.getElementById('simSlider').value = state.distanceKm.toFixed(1);
+          renderAll();
+        }, 250);
+      } else {
+        btn.textContent = `▶ Simular ${simSpeed}x`;
+        btn.style.background = '';
+        btn.style.color = '';
+        clearInterval(simTimer);
+        simTimer = null;
+        if (!state.isRunning) state.speedKmh = 0;
+        renderAll();
+      }
+    }
+
+    function cycleSimSpeed() {
+      const list = [1, 10, 30, 60];
+      simSpeed = list[(list.indexOf(simSpeed) + 1) % list.length];
+      document.getElementById('btnSimSpeed').textContent = `${simSpeed}x`;
+      if (!isSimPlaying) document.getElementById('btnSimToggle').textContent = `▶ Simular ${simSpeed}x`;
+    }
+
+    function onSimSliderInput(val) {
+      const targetKm = parseFloat(val);
+      const diff = targetKm - state.distanceKm;
+      if (diff > 0) {
+        advanceKm(diff);
+      } else {
+        state.distanceKm = targetKm;
+        const pt = getPointAtKm(targetKm);
+        if (pt) state.altM = pt.ele;
+        detectedClimbs.forEach(c => {
+          if (c.startKm > targetKm) delete state.triggeredClimbBefore[c.id];
+          if (c.midKm > targetKm) delete state.triggeredClimbMid[c.id];
+          if (c.endKm > targetKm) delete state.triggeredClimbSummit[c.id];
+        });
+        detectedDescents.forEach(d => {
+          if (d.startKm > targetKm) delete state.triggeredDescentBefore[d.id];
+          if (d.endKm > targetKm) delete state.triggeredDescentEnd[d.id];
+        });
+      }
+      renderAll();
+    }
+
+    /***************************************************************************
+     * 9. GERENCIAMENTO DE ROTAS & CONFIGURAÇÕES
+     ***************************************************************************/
+    function getActiveRoute() {
+      if (state.routeId === 'custom' && state.customRoute) return state.customRoute;
+      return BUILTIN_ROUTES[state.routeId] || BUILTIN_ROUTES.day1;
+    }
+
+    function recomputeElevationSegments() {
+      detectedClimbs = detectClimbsClimbPro(profilePoints, state.minGradient);
+      detectedDescents = detectDescentsDescentPro(profilePoints, state.minGradient);
+    }
+
+    function selectRoute(id) {
+      if (id === 'custom' && !state.customRoute) {
+        document.getElementById('gpxInput').click();
+        return;
+      }
+      state.routeId = id;
+      const route = getActiveRoute();
+      profilePoints = route.points ? route.points : buildProfileFromAnchors(route.anchors);
+      recomputeElevationSegments();
+
+      ['day1', 'day2', 'custom'].forEach(r => {
+        document.getElementById(`btnRoute_${r}`).classList.toggle('selected', r === id);
+      });
+
+      if (state.customRoute) {
+        document.getElementById('customNameLabel').textContent = state.customRoute.name;
+        document.getElementById('customMetaLabel').textContent = `${state.customRoute.totalKm} km • +${state.customRoute.totalGain}m`;
+      }
+
+      const slider = document.getElementById('simSlider');
+      slider.max = route.totalKm;
+      slider.value = Math.min(state.distanceKm, route.totalKm);
+      document.getElementById('simMaxKmLabel').textContent = `${route.totalKm}km`;
+      document.getElementById('svgEndKm').textContent = `${route.totalKm.toFixed(1)} km`;
+
+      renderAll();
+      saveState();
+    }
+
+    function setMinGradient(val) {
+      if (isNaN(val)) return;
+      state.minGradient = Math.max(2, Math.min(25, val));
+      document.getElementById('gradInput').value = state.minGradient;
+      document.querySelectorAll('.gradLegendSpan').forEach(el => el.textContent = state.minGradient);
+
+      document.querySelectorAll('.grad-btn').forEach(b => {
+        b.classList.toggle('active', parseFloat(b.dataset.grad) === state.minGradient);
+      });
+
+      recomputeElevationSegments();
+      renderAll();
+      saveState();
+    }
+
+    function setLeadKm(val) {
+      state.leadKm = val;
+      saveState();
+      showToast('⛰️', `Antecedência ajustada para ${fmtDist(val)}.`);
+    }
+
+    function setCaffeineCutoff(val) {
+      state.caffeineCutoffMin = Math.max(0, Math.min(300, parseInt(val, 10) || 90));
+      renderAll();
+      saveState();
+      showToast('🌙', `Corte de cafeína ajustado para ${state.caffeineCutoffMin} min antes da pousada.`);
+    }
+
+    function getPointAtKm(km) {
+      if (!profilePoints.length) return null;
+      let best = profilePoints[0];
+      let minD = Math.abs(best.km - km);
+      for (let i = 1; i < profilePoints.length; i++) {
+        const d = Math.abs(profilePoints[i].km - km);
+        if (d < minD) {
+          minD = d;
+          best = profilePoints[i];
+        }
+      }
+      return best;
+    }
+
+    function getAvgSpeed() {
+      if (state.speedKmh >= 5 && state.isRunning && !isSimPlaying) return state.speedKmh;
+      if (state.elapsedSec > 120 && state.distanceKm > 0.5) {
+        return Math.max(6, Math.min(40, state.distanceKm / (state.elapsedSec / 3600)));
+      }
+      return 12.2;
+    }
+
+    /***************************************************************************
+     * 10. RENDERIZAÇÃO DA INTERFACE E GRÁFICO SVG BIDIRECIONAL
+     ***************************************************************************/
+    function renderAll() {
+      const route = getActiveRoute();
+      const remKm = Math.max(0, route.totalKm - state.distanceKm);
+      const avgSpd = getAvgSpeed();
+
+      // Telemetria
+      document.getElementById('valDist').textContent = state.distanceKm.toFixed(1);
+      document.getElementById('valRemDist').textContent = `Faltam ${remKm.toFixed(1)} km`;
+
+      const hrs = Math.floor(state.elapsedSec / 3600);
+      const mins = Math.floor((state.elapsedSec % 3600) / 60);
+      const secs = Math.floor(state.elapsedSec % 60);
+      document.getElementById('valTime').textContent = `${String(hrs).padStart(2, '0')}:${String(mins).padStart(2, '0')}`;
+
+      const eta = new Date(Date.now() + (remKm / avgSpd) * 3600 * 1000);
+      const etaStr = `${String(eta.getHours()).padStart(2, '0')}:${String(eta.getMinutes()).padStart(2, '0')}`;
+      document.getElementById('valEta').textContent = `${String(secs).padStart(2, '0')}s • Chegada ~${etaStr}`;
+
+      document.getElementById('valSpeed').textContent = state.speedKmh.toFixed(1);
+      document.getElementById('valAvgSpeed').textContent = `Média: ${avgSpd.toFixed(1)} km/h`;
+      document.getElementById('valAlt').textContent = Math.round(state.altM);
+      document.getElementById('valGain').textContent = `Ganho: +${Math.round(state.gainM)} m`;
+
+      // Status Trava Cafeína
+      const cafPill = document.getElementById('caffeinePill');
+      if (state.routeId !== 'day1') {
+        cafPill.className = 'pill';
+        cafPill.textContent = 'APENAS DIA 1';
+      } else if (isCaffeineBlocked()) {
+        cafPill.className = 'pill warn';
+        cafPill.textContent = '🌙 CORTE ATIVO (SEM CAFEÍNA)';
+      } else {
+        cafPill.className = 'pill ok';
+        cafPill.textContent = 'LIBERADO AGORA';
+      }
+
+      renderBidirectionalHeroCard(avgSpd);
+      renderSvgChart();
+      renderElevationLists();
+      renderTimersGrid();
+      renderCheckpointsList();
+    }
+
+    function renderBidirectionalHeroCard(avgSpd) {
+      const d = state.distanceKm;
+      const activeClimb = detectedClimbs.find(c => d >= c.startKm && d < c.endKm);
+      const activeDescent = detectedDescents.find(dn => d >= dn.startKm && d < dn.endKm);
+
+      const nextClimb = detectedClimbs.find(c => c.startKm >= d);
+      const nextDescent = detectedDescents.find(dn => dn.startKm >= d);
+
+      let nextEvent = null;
+      if (nextClimb && nextDescent) {
+        nextEvent = nextClimb.startKm <= nextDescent.startKm ? nextClimb : nextDescent;
+      } else {
+        nextEvent = nextClimb || nextDescent;
+      }
+
+      const hero = document.getElementById('climbHeroCard');
+      const badge = document.getElementById('climbStatusBadge');
+      const lm = document.getElementById('climbLandmarkText');
+      const title = document.getElementById('climbHeroTitle');
+      const progArea = document.getElementById('climbProgressArea');
+      const progFill = document.getElementById('climbProgressFill');
+      const progLabels = document.getElementById('climbProgressLabels');
+
+      if (activeClimb) {
+        const doneKm = Math.max(0, d - activeClimb.startKm);
+        const remKm = Math.max(0.01, activeClimb.endKm - d);
+        const pct = Math.min(100, Math.round((doneKm / activeClimb.lengthKm) * 100));
+        const currPt = getPointAtKm(d);
+        const remEle = Math.max(0, Math.round(activeClimb.summitEle - (currPt ? currPt.ele : activeClimb.startEle)));
+        const etaMin = Math.max(1, Math.round((remKm / Math.max(7, avgSpd * 0.78)) * 60));
+
+        hero.className = 'climb-hero climbing-now';
+        badge.textContent = '🔥 ESCALANDO AGORA • CLIMBPRO UP';
+        lm.textContent = `${activeClimb.landmark} • Cume: ${activeClimb.summitEle}m`;
+        title.textContent = `Subida em curso • Máx +${activeClimb.maxGrad}% (Média +${activeClimb.avgGrad}%)`;
+
+        progArea.style.display = 'block';
+        progLabels.style.color = '#fdba74';
+        progFill.className = 'progress-fill';
+        document.getElementById('climbPctText').textContent = `Escalado: ${pct}%`;
+        document.getElementById('climbRemEleText').textContent = `Faltam +${remEle}m até o cume`;
+        progFill.style.width = `${pct}%`;
+
+        document.getElementById('cMetric1Lbl').textContent = 'Falta p/ Cume';
+        document.getElementById('cMetric1Val').textContent = fmtDist(remKm);
+        document.getElementById('cMetric1Val').style.color = '#fb923c';
+        document.getElementById('cMetric2Lbl').textContent = 'Tempo p/ Topo';
+        document.getElementById('cMetric2Val').textContent = `~${etaMin} min`;
+        document.getElementById('cMetric3Lbl').textContent = 'Extensão Subida';
+        document.getElementById('cMetric3Val').textContent = fmtDist(activeClimb.lengthKm);
+        document.getElementById('cMetric4Lbl').textContent = 'Elev. Restante';
+        document.getElementById('cMetric4Val').textContent = `+${remEle} m`;
+      } else if (activeDescent) {
+        const doneKm = Math.max(0, d - activeDescent.startKm);
+        const remKm = Math.max(0.01, activeDescent.endKm - d);
+        const pct = Math.min(100, Math.round((doneKm / activeDescent.lengthKm) * 100));
+        const currPt = getPointAtKm(d);
+        const remDrop = Math.max(0, Math.round((currPt ? currPt.ele : activeDescent.startEle) - activeDescent.baseEle));
+        const etaMin = Math.max(1, Math.round((remKm / Math.max(18, avgSpd * 1.45)) * 60));
+
+        hero.className = 'climb-hero descending-now';
+        badge.textContent = '🪂 DESCENDO AGORA • RECOMPENSA & CAUTELA';
+        lm.textContent = `${activeDescent.landmark} • Base: ${activeDescent.baseEle}m`;
+        title.textContent = `Descanse as pernas, hidrate e olho nas curvas! (-${activeDescent.maxGrad}%)`;
+
+        progArea.style.display = 'block';
+        progLabels.style.color = '#7dd3fc';
+        progFill.className = 'progress-fill descent';
+        document.getElementById('climbPctText').textContent = `Descido: ${pct}%`;
+        document.getElementById('climbRemEleText').textContent = `Faltam -${remDrop}m até a base`;
+        progFill.style.width = `${pct}%`;
+
+        document.getElementById('cMetric1Lbl').textContent = 'Falta p/ Base';
+        document.getElementById('cMetric1Val').textContent = fmtDist(remKm);
+        document.getElementById('cMetric1Val').style.color = '#38bdf8';
+        document.getElementById('cMetric2Lbl').textContent = 'Tempo Descida';
+        document.getElementById('cMetric2Val').textContent = `~${etaMin} min`;
+        document.getElementById('cMetric3Lbl').textContent = 'Extensão Descida';
+        document.getElementById('cMetric3Val').textContent = fmtDist(activeDescent.lengthKm);
+        document.getElementById('cMetric4Lbl').textContent = 'Desnível Rest.';
+        document.getElementById('cMetric4Val').textContent = `-${remDrop} m`;
+      } else if (nextEvent) {
+        const distTo = Math.max(0, nextEvent.startKm - d);
+        const etaMin = Math.max(1, Math.round((distTo / avgSpd) * 60));
+        const isUp = nextEvent.type === 'climb';
+
+        hero.className = isUp ? 'climb-hero' : 'climb-hero next-descent';
+        badge.textContent = isUp
+          ? `⛰️ PRÓXIMA SUBIDA >= +${state.minGradient}%`
+          : `🪂 PRÓXIMA DESCIDA (RECOMPENSA) <= -${state.minGradient}%`;
+        lm.textContent = isUp
+          ? `${nextEvent.landmark} (Km ${nextEvent.startKm.toFixed(1)}) • Cume: ${nextEvent.summitEle}m`
+          : `${nextEvent.landmark} (Km ${nextEvent.startKm.toFixed(1)}) • Base: ${nextEvent.baseEle}m`;
+        title.textContent = isUp
+          ? `Subida de ${fmtDist(nextEvent.lengthKm)} • Máx +${nextEvent.maxGrad}% (Méd +${nextEvent.avgGrad}%)`
+          : `Descida de ${fmtDist(nextEvent.lengthKm)} • Máx -${nextEvent.maxGrad}% (Méd -${nextEvent.avgGrad}%)`;
+        progArea.style.display = 'none';
+
+        document.getElementById('cMetric1Lbl').textContent = 'Início em';
+        document.getElementById('cMetric1Val').textContent = fmtDist(distTo);
+        document.getElementById('cMetric1Val').style.color = isUp ? '#f59e0b' : '#38bdf8';
+        document.getElementById('cMetric2Lbl').textContent = 'Chegada Est.';
+        document.getElementById('cMetric2Val').textContent = etaMin >= 60 ? `${Math.floor(etaMin/60)}h${String(etaMin%60).padStart(2,'0')}` : `~${etaMin} min`;
+        document.getElementById('cMetric3Lbl').textContent = 'Extensão Trecho';
+        document.getElementById('cMetric3Val').textContent = fmtDist(nextEvent.lengthKm);
+        document.getElementById('cMetric4Lbl').textContent = isUp ? 'Ganho até Cume' : 'Perda até Base';
+        document.getElementById('cMetric4Val').textContent = isUp ? `+${nextEvent.gainM} m` : `-${nextEvent.dropM} m`;
+        document.getElementById('cMetric4Val').style.color = isUp ? '#10b981' : '#38bdf8';
+      } else {
+        hero.className = 'climb-hero clear-road';
+        badge.textContent = '✅ TERRENO FAVORÁVEL';
+        lm.textContent = 'Trecho final do percurso';
+        title.textContent = `Nenhuma rampa ou descida acentuada (> ${state.minGradient}%) restante!`;
+        progArea.style.display = 'none';
+
+        document.getElementById('cMetric1Lbl').textContent = 'Início em';
+        document.getElementById('cMetric1Val').textContent = '--';
+        document.getElementById('cMetric2Lbl').textContent = 'Chegada Est.';
+        document.getElementById('cMetric2Val').textContent = '--';
+        document.getElementById('cMetric3Lbl').textContent = 'Extensão Trecho';
+        document.getElementById('cMetric3Val').textContent = '--';
+        document.getElementById('cMetric4Lbl').textContent = 'Desnível';
+        document.getElementById('cMetric4Val').textContent = 'Plano';
+      }
+    }
+
+    function renderSvgChart() {
+      const svg = document.getElementById('elevationSvg');
+      if (!svg || !profilePoints.length) return;
+
+      const W = 800, H = 190;
+      const padL = 42, padR = 14, padT = 16, padB = 18;
+      const pW = W - padL - padR;
+      const pH = H - padT - padB;
+
+      const maxKm = profilePoints[profilePoints.length - 1].km || 1;
+      let minE = Infinity, maxE = -Infinity;
+      profilePoints.forEach(p => {
+        if (p.ele < minE) minE = p.ele;
+        if (p.ele > maxE) maxE = p.ele;
+      });
+      minE = Math.floor((minE - 30) / 50) * 50;
+      maxE = Math.ceil((maxE + 40) / 50) * 50;
+      const spanE = Math.max(100, maxE - minE);
+
+      const xOf = km => padL + (km / maxKm) * pW;
+      const yOf = ele => padT + pH - ((ele - minE) / spanE) * pH;
+
+      let out = `<defs>
+        <linearGradient id="eleGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.32"/>
+          <stop offset="100%" stop-color="#050811" stop-opacity="0.02"/>
+        </linearGradient>
+      </defs>`;
+
+      // Grades horizontais
+      for (let g = 0; g <= 3; g++) {
+        const eVal = Math.round(minE + (spanE * g) / 3);
+        const y = yOf(eVal).toFixed(1);
+        out += `<line x1="${padL}" y1="${y}" x2="${W - padR}" y2="${y}" stroke="#1e293b" stroke-width="1"/>`;
+        out += `<text x="${padL - 6}" y="${Number(y) + 4}" fill="#64748b" font-size="11" font-family="monospace" text-anchor="end">${eVal}m</text>`;
+      }
+
+      // Faixas de Subida (Rosa) e Descida (Azul)
+      detectedClimbs.forEach(c => {
+        const x1 = xOf(c.startKm).toFixed(1);
+        const x2 = xOf(c.endKm).toFixed(1);
+        const w = Math.max(3, x2 - x1).toFixed(1);
+        out += `<rect x="${x1}" y="${padT}" width="${w}" height="${pH}" fill="rgba(244,63,94,0.16)"/>`;
+      });
+      detectedDescents.forEach(dn => {
+        const x1 = xOf(dn.startKm).toFixed(1);
+        const x2 = xOf(dn.endKm).toFixed(1);
+        const w = Math.max(3, x2 - x1).toFixed(1);
+        out += `<rect x="${x1}" y="${padT}" width="${w}" height="${pH}" fill="rgba(56,189,248,0.14)"/>`;
+      });
+
+      // Área preenchida do perfil
+      let poly = `${xOf(0).toFixed(1)},${padT + pH} `;
+      profilePoints.forEach(p => {
+        poly += `${xOf(p.km).toFixed(1)},${yOf(p.ele).toFixed(1)} `;
+      });
+      poly += `${xOf(maxKm).toFixed(1)},${padT + pH}`;
+      out += `<polygon points="${poly}" fill="url(#eleGrad)"/>`;
+
+      // Linha base do traçado
+      let linePts = profilePoints.map(p => `${xOf(p.km).toFixed(1)},${yOf(p.ele).toFixed(1)}`).join(' ');
+      out += `<polyline points="${linePts}" fill="none" stroke="#f59e0b" stroke-width="2.2" stroke-linejoin="round"/>`;
+
+      // Destaques Subidas (Vermelho) + Cume
+      detectedClimbs.forEach(c => {
+        const segPts = profilePoints
+          .filter(p => p.km >= c.startKm && p.km <= c.endKm)
+          .map(p => `${xOf(p.km).toFixed(1)},${yOf(p.ele).toFixed(1)}`)
+          .join(' ');
+        if (segPts) {
+          out += `<polyline points="${segPts}" fill="none" stroke="#f43f5e" stroke-width="3.6" stroke-linecap="round"/>`;
+        }
+        out += `<circle cx="${xOf(c.endKm).toFixed(1)}" cy="${yOf(c.summitEle).toFixed(1)}" r="3.8" fill="#10b981" stroke="#050811" stroke-width="1.2"/>`;
+      });
+
+      // Destaques Descidas (Azul Ciano) + Base
+      detectedDescents.forEach(dn => {
+        const segPts = profilePoints
+          .filter(p => p.km >= dn.startKm && p.km <= dn.endKm)
+          .map(p => `${xOf(p.km).toFixed(1)},${yOf(p.ele).toFixed(1)}`)
+          .join(' ');
+        if (segPts) {
+          out += `<polyline points="${segPts}" fill="none" stroke="#38bdf8" stroke-width="3.6" stroke-linecap="round"/>`;
+        }
+        out += `<circle cx="${xOf(dn.endKm).toFixed(1)}" cy="${yOf(dn.baseEle).toFixed(1)}" r="3.5" fill="#10b981" stroke="#050811" stroke-width="1.2"/>`;
+      });
+
+      // Posição atual do ciclista
+      const cKm = Math.min(maxKm, Math.max(0, state.distanceKm));
+      const cPt = getPointAtKm(cKm) || profilePoints[0];
+      const cx = xOf(cKm).toFixed(1);
+      const cy = yOf(cPt.ele).toFixed(1);
+      out += `<line x1="${cx}" y1="${padT}" x2="${cx}" y2="${padT + pH}" stroke="#ffffff" stroke-width="1.8" stroke-dasharray="4,4"/>`;
+      out += `<circle cx="${cx}" cy="${cy}" r="6.5" fill="#ffffff" stroke="#050811" stroke-width="2.5"/>`;
+
+      svg.innerHTML = out;
+    }
+
+    function renderElevationLists() {
+      document.getElementById('climbCountText').textContent = detectedClimbs.length;
+      const cBox = document.getElementById('climbsList');
+      cBox.innerHTML = detectedClimbs.length
+        ? detectedClimbs.map(c => {
+            const done = state.distanceKm >= c.endKm;
+            return `
+              <div class="list-row ${done ? 'passed' : ''}">
+                <div>
+                  <div style="font-weight:800;">${done ? '✅' : '⛰️'} Km ${c.startKm.toFixed(1)} → Cume Km ${c.endKm.toFixed(1)} (${c.landmark})</div>
+                  <div style="color:#94a3b8; font-size:11px; margin-top:2px;">Extensão: <b>${fmtDist(c.lengthKm)}</b> • Ganho: <b>+${c.gainM}m</b> • Cume: ${c.summitEle}m</div>
+                </div>
+                <div class="mono" style="text-align:right; flex-shrink:0;">
+                  <div style="font-weight:900; color:#f43f5e;">+${c.maxGrad}%</div>
+                  <div style="font-size:11px; color:#94a3b8;">Méd +${c.avgGrad}%</div>
+                </div>
+              </div>
+            `;
+          }).join('')
+        : `<div class="list-row">Nenhuma subida &ge; +${state.minGradient}% detectada.</div>`;
+
+      document.getElementById('descentCountText').textContent = detectedDescents.length;
+      const dBox = document.getElementById('descentsList');
+      dBox.innerHTML = detectedDescents.length
+        ? detectedDescents.map(dn => {
+            const done = state.distanceKm >= dn.endKm;
+            return `
+              <div class="list-row ${done ? 'passed' : ''}">
+                <div>
+                  <div style="font-weight:800;">${done ? '✅' : '🪂'} Km ${dn.startKm.toFixed(1)} → Base Km ${dn.endKm.toFixed(1)} (${dn.landmark})</div>
+                  <div style="color:#94a3b8; font-size:11px; margin-top:2px;">Extensão: <b>${fmtDist(dn.lengthKm)}</b> • Queda: <b>-${dn.dropM}m</b> • Base: ${dn.baseEle}m</div>
+                </div>
+                <div class="mono" style="text-align:right; flex-shrink:0;">
+                  <div style="font-weight:900; color:#38bdf8;">-${dn.maxGrad}%</div>
+                  <div style="font-size:11px; color:#94a3b8;">Méd -${dn.avgGrad}%</div>
+                </div>
+              </div>
+            `;
+          }).join('')
+        : `<div class="list-row">Nenhuma descida &le; -${state.minGradient}% detectada.</div>`;
+    }
+
+    function renderTimersGrid() {
+      const grid = document.getElementById('timersGrid');
+      grid.innerHTML = state.alarms.map((a, idx) => {
+        const targetSec = a.interval * 60;
+        const remSec = Math.max(0, targetSec - a.elapsed);
+        const m = Math.floor(remSec / 60);
+        const s = Math.floor(remSec % 60);
+        const pct = Math.min(100, (a.elapsed / targetSec) * 100);
+        const urgent = pct >= 85 && a.enabled;
+        const cut = a.id === 'carbogel' && isCaffeineBlocked();
+
+        return `
+          <div class="timer-card ${cut ? 'cut-active' : (urgent ? 'urgent' : '')} ${!a.enabled ? 'disabled' : ''}">
+            <div class="timer-top">
+              <div class="timer-info">
+                <div class="timer-icon">${cut ? '🍬' : a.icon}</div>
+                <div>
+                  <div class="timer-name">${cut ? 'Balinha / Água (Gel Cortado)' : a.name}</div>
+                  <div class="timer-hint">${cut ? 'Protegendo sono na Pousada da Marlene' : (a.hint || '')}</div>
+                  <div class="inline-control" style="margin-top:4px;">
+                    <span>A cada</span>
+                    <input type="number" value="${a.interval}" min="1" max="300" style="width:54px; padding:3px 5px; text-align:center; color:#f59e0b;" onchange="updateAlarmMin(${idx}, this.value)" />
+                    <span>min</span>
+                  </div>
+                </div>
+              </div>
+              <div class="timer-countdown">
+                <div style="font-size:10px; font-weight:800; color:#94a3b8; text-transform:uppercase;">Faltam</div>
+                <div class="timer-countdown-val mono" style="color:${urgent ? '#f59e0b' : '#f8fafc'};">${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}</div>
+              </div>
+            </div>
+
+            <div class="timer-bar"><div class="timer-bar-fill" style="width:${pct}%;"></div></div>
+
+            <div class="timer-actions">
+              <button class="btn-reset-timer" onclick="resetTimer(${idx})">✓ Já tomei / Reiniciar</button>
+              <button class="btn-dark" style="padding:8px 11px;" onclick="toggleAlarm(${idx})">${a.enabled ? '🔔' : '🔕'}</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function updateAlarmMin(idx, val) {
+      const v = Math.max(1, parseInt(val, 10) || 15);
+      state.alarms[idx].interval = v;
+      state.alarms[idx].elapsed = 0;
+      renderTimersGrid();
+      saveState();
+      showToast('⏱️', `${state.alarms[idx].name}: intervalo ajustado para ${v} min.`);
+    }
+
+    function resetTimer(idx) {
+      state.alarms[idx].elapsed = 0;
+      renderTimersGrid();
+      saveState();
+      showToast('✅', `${state.alarms[idx].name} reiniciado!`);
+    }
+
+    function toggleAlarm(idx) {
+      state.alarms[idx].enabled = !state.alarms[idx].enabled;
+      renderTimersGrid();
+      saveState();
+    }
+
+    function resetNutritionDefaults() {
+      state.alarms = JSON.parse(JSON.stringify(SCIENTIFIC_ALARMS));
+      state.caffeineCutoffMin = 90;
+      document.getElementById('caffeineCutoffInput').value = 90;
+      renderAll();
+      saveState();
+      showToast('📊', 'Protocolo Nutricional Científico (ACSM/ISSN) restaurado!');
+    }
+
+    function renderCheckpointsList() {
+      const route = getActiveRoute();
+      const box = document.getElementById('checkpointsList');
+      box.innerHTML = (route.checkpoints || []).map(cp => {
+        const done = state.distanceKm >= cp.km;
+        return `
+          <div class="list-row ${done ? 'passed' : ''}">
+            <div>
+              <div style="font-weight:800; color:${done ? '#10b981' : '#f8fafc'};">${done ? '✅' : '📍'} Km ${cp.km.toFixed(1)} — ${cp.name}</div>
+              <div style="color:#94a3b8; font-size:11px; margin-top:2px;">${cp.note}</div>
+            </div>
+            <span class="pill mono">${cp.time}</span>
+          </div>
+        `;
+      }).join('');
+    }
+
+    /***************************************************************************
+     * 11. MODAIS, RESET, EXPORTAÇÃO OFFLINE E STORAGE
+     ***************************************************************************/
+    function openScienceModal() { document.getElementById('scienceModal').classList.add('open'); }
+    function closeScienceModal() { document.getElementById('scienceModal').classList.remove('open'); }
+    function openResetModal() { document.getElementById('resetModal').classList.add('open'); }
+    function closeResetModal() { document.getElementById('resetModal').classList.remove('open'); }
+
+    function confirmReset() {
+      closeResetModal();
+      if (isSimPlaying) toggleSimulation();
+      state.isRunning = false;
+      state.elapsedSec = 0;
+      state.distanceKm = 0;
+      state.speedKmh = 0;
+      state.gainM = 0;
+      state.lastGps = null;
+      state.triggeredClimbBefore = {};
+      state.triggeredClimbMid = {};
+      state.triggeredClimbSummit = {};
+      state.triggeredDescentBefore = {};
+      state.triggeredDescentEnd = {};
+      state.alarms.forEach(a => a.elapsed = 0);
+
+      const p0 = getPointAtKm(0);
+      if (p0) state.altM = p0.ele;
+
+      const btn = document.getElementById('btnStartRide');
+      btn.classList.remove('running');
+      btn.textContent = '▶️ INICIAR GPS REAL';
+      document.getElementById('simSlider').value = 0;
+
+      renderAll();
+      saveState();
+      showToast('↺', 'Pedal zerado!');
+    }
+
+    function exportOfflineHtml() {
+      try {
+        const snapshot = JSON.stringify({
+          minGradient: state.minGradient,
+          leadKm: state.leadKm,
+          caffeineCutoffMin: state.caffeineCutoffMin,
+          voiceStyle: state.voiceStyle,
+          alarms: state.alarms.map(a => ({ ...a, elapsed: 0 }))
+        });
+        let html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+        html = html.replace(
+          "const STORAGE_KEY = 'copiloto_rota_luz_v5_bidir';",
+          `const STORAGE_KEY = 'copiloto_rota_luz_v5_bidir';\n    if (!localStorage.getItem(STORAGE_KEY)) { localStorage.setItem(STORAGE_KEY, ${JSON.stringify(snapshot)}); }`
+        );
+        const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'Copiloto-Rota-da-Luz-Offline.html';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showToast('💾', 'Arquivo offline salvo com suas configurações!');
+      } catch (e) {
+        showToast('⚠️', 'Use o menu do navegador > Adicionar à Tela Inicial.');
+      }
+    }
+
+    function saveState() {
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
+    }
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          state = { ...state, ...parsed, isRunning: false, lastGps: null };
+          document.getElementById('gradInput').value = state.minGradient;
+          document.getElementById('leadKmSelect').value = state.leadKm.toFixed(1);
+          document.getElementById('caffeineCutoffInput').value = state.caffeineCutoffMin;
+          document.querySelectorAll('.gradLegendSpan').forEach(el => el.textContent = state.minGradient);
+          document.querySelectorAll('.grad-btn').forEach(b => {
+            b.classList.toggle('active', parseFloat(b.dataset.grad) === state.minGradient);
+          });
+          setVoicePersonality(state.voiceStyle || 'cinema');
+        }
+      } catch (e) {}
+    }
+
+    let toastTimer = null;
+    function showToast(icon, text) {
+      const el = document.getElementById('toastEl');
+      document.getElementById('toastIcon').textContent = icon;
+      document.getElementById('toastText').textContent = text;
+      el.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => el.classList.remove('show'), 3200);
+    }
+
+    window.onload = function() {
+      loadState();
+      selectRoute(state.routeId);
+      if (state.distanceKm > 0) {
+        document.getElementById('simSlider').value = state.distanceKm;
+      }
+    };
+  </script>
+</body>
+</html>
